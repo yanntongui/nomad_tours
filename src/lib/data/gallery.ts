@@ -1,0 +1,68 @@
+import { GalleryPhoto } from "@/types";
+
+export const GALLERY_PHOTOS: GalleryPhoto[] = [
+  {
+    id: "gal-1",
+    image: "https://images.unsplash.com/photo-1760637626892-7636eff73752?auto=format&fit=crop&w=1200&q=80",
+    caption: "Vue aérienne sur la cité lacustre",
+    location: "Ganvié",
+    tripTitle: "Trésors du Sud-Bénin",
+    date: "Mai 2026",
+  },
+  {
+    id: "gal-2",
+    image: "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1200&q=80",
+    caption: "Départ en safari à l'heure dorée",
+    location: "Parc de la Pendjari",
+    tripTitle: "Grand Safari Pendjari",
+    date: "Avril 2026",
+  },
+  {
+    id: "gal-3",
+    image: "https://images.unsplash.com/photo-1579493933703-70473cdf84f8?auto=format&fit=crop&w=1200&q=80",
+    caption: "Farniente sous les cocotiers",
+    location: "Grand-Popo",
+    tripTitle: "Escapade Marine",
+    date: "Mars 2026",
+  },
+  {
+    id: "gal-4",
+    image: "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=1200&q=80",
+    caption: "Zèbres et girafes au fil de la piste",
+    location: "Parc de la Pendjari",
+    tripTitle: "Grand Safari Pendjari",
+    date: "Avril 2026",
+  },
+  {
+    id: "gal-5",
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+    caption: "Instant de calme face à l'océan",
+    location: "Ouidah",
+    tripTitle: "Trésors du Sud-Bénin",
+    date: "Mai 2026",
+  },
+  {
+    id: "gal-6",
+    image: "https://images.unsplash.com/photo-1547721064-da6cfb341d50?auto=format&fit=crop&w=1200&q=80",
+    caption: "Rencontre inattendue sur la piste",
+    location: "Parc de la Pendjari",
+    tripTitle: "Grand Safari Pendjari",
+    date: "Janvier 2026",
+  },
+  {
+    id: "gal-7",
+    image: "https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=1200&q=80",
+    caption: "Sourires et rencontres locales",
+    location: "Ouidah",
+    tripTitle: "Trésors du Sud-Bénin",
+    date: "Février 2026",
+  },
+  {
+    id: "gal-8",
+    image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80",
+    caption: "Voile et sable fin",
+    location: "Grand-Popo",
+    tripTitle: "Escapade Marine",
+    date: "Décembre 2025",
+  },
+];
