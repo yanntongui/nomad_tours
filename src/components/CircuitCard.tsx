@@ -2,20 +2,22 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, MapPin, CheckCircle, Send, ArrowRight } from "lucide-react";
-import { Circuit } from "@/types";
+import { Clock, MapPin, CheckCircle, Send } from "lucide-react";
+import type { CircuitRow } from "@/lib/server/circuits";
 import { useQuoteModal } from "@/context/QuoteModalContext";
 
+export type PublicCircuit = CircuitRow & { destinationName: string };
+
 interface CircuitCardProps {
-  circuit: Circuit;
+  circuit: PublicCircuit;
   onOpenQuoteModal?: (destinationId?: string, circuitId?: string) => void;
 }
 
 export default function CircuitCard({ circuit, onOpenQuoteModal }: CircuitCardProps) {
   const { openQuoteModal } = useQuoteModal();
   const handleQuote = () => {
-    if (onOpenQuoteModal) onOpenQuoteModal(circuit.destinationId, circuit.id);
-    else openQuoteModal(circuit.destinationId, circuit.id);
+    if (onOpenQuoteModal) onOpenQuoteModal(circuit.destination_id, circuit.id);
+    else openQuoteModal(circuit.destination_id, circuit.id);
   };
 
   return (
@@ -30,7 +32,7 @@ export default function CircuitCard({ circuit, onOpenQuoteModal }: CircuitCardPr
         />
         <div className="absolute top-3 left-3 bg-nomad-navy text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow">
           <Clock className="w-3 h-3 text-nomad-gold" />
-          <span>{circuit.durationDays} Jours / {circuit.durationDays - 1} Nuits</span>
+          <span>{circuit.duration_days} Jours / {circuit.duration_days - 1} Nuits</span>
         </div>
         <div className="absolute top-3 right-3 bg-nomad-terracotta text-white text-[10px] uppercase font-bold px-2.5 py-1 rounded-full shadow">
           {circuit.theme}
@@ -72,11 +74,13 @@ export default function CircuitCard({ circuit, onOpenQuoteModal }: CircuitCardPr
             <span className="text-[10px] text-stone-400 block uppercase font-semibold">Prix par personne</span>
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg font-black text-nomad-navy">
-                {circuit.priceXOF.toLocaleString("fr-FR")} FCFA
+                {circuit.price_xof.toLocaleString("fr-FR")} FCFA
               </span>
-              <span className="text-xs text-stone-400 font-normal">
-                (~{circuit.priceEUR} €)
-              </span>
+              {circuit.price_eur != null && (
+                <span className="text-xs text-stone-400 font-normal">
+                  (~{circuit.price_eur} €)
+                </span>
+              )}
             </div>
           </div>
 

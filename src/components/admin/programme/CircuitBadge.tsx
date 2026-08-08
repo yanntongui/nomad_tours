@@ -10,7 +10,6 @@ import {
   getTemporalStatus,
   isAtRisk,
 } from "@/lib/admin/programme-annuel";
-import { getActiveTripForCircuit } from "@/lib/admin/store/trips-store";
 
 function countdownStyle(daysUntil: number): string {
   if (daysUntil < 7) return "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800";
@@ -18,12 +17,20 @@ function countdownStyle(daysUntil: number): string {
   return "bg-stone-100 text-stone-600 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700";
 }
 
-export function CircuitBadge({ departure, now }: { departure: DepartureWithCircuit; now: Date }) {
+export function CircuitBadge({
+  departure,
+  now,
+  activeTripId,
+}: {
+  departure: DepartureWithCircuit;
+  now: Date;
+  activeTripId?: string;
+}) {
   const status = getTemporalStatus(new Date(departure.date), now);
   const daysUntil = getDaysUntil(departure.date, now);
   const fillRate = computeFillRate(departure);
   const risk = isAtRisk(departure, now);
-  const activeTrip = status === "CURRENT" ? getActiveTripForCircuit(departure.circuit.id) : undefined;
+  const activeTrip = status === "CURRENT" && activeTripId ? { id: activeTripId } : undefined;
 
   return (
     <div

@@ -14,24 +14,25 @@ import { fr } from "date-fns/locale";
 import { Wallet, Users, Percent, Star } from "lucide-react";
 import { KpiCard } from "@/components/admin/KpiCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBookingsStore } from "@/lib/admin/store/bookings-store";
-import { useTrips } from "@/lib/admin/store/trips-store";
 import type { CircuitRow } from "@/lib/server/circuits";
+import type { listBookingsForCircuit } from "@/lib/server/bookings";
+
+type CircuitBooking = Awaited<ReturnType<typeof listBookingsForCircuit>>[number];
 
 function formatXOF(n: number) {
   return `${n.toLocaleString("fr-FR")} FCFA`;
 }
 
-export function CircuitStatsTab({ circuit }: { circuit: CircuitRow }) {
-  const { bookings } = useBookingsStore();
-  const trips = useTrips();
-
-  const circuitBookings = React.useMemo(
-    () => bookings.filter((b) => b.type === "CIRCUIT" && b.referenceId === circuit.id),
-    [bookings, circuit.id]
-  );
-
-  const totalRevenue = circuitBookings.reduce((sum, b) => sum + b.paidXOF, 0);
+export function CircuitStatsTab({
+  circuit,
+  avgRating,
+  bookings: circuitBookings,
+}: {
+  circuit: CircuitRow;
+  avgRating: number | null;
+  bookings: CircuitBooking[];
+}) {
+  const totalRevenue = circuitBookings.reduce((sum, b) => sum + b.paid_xof, 0);
   const totalPassengers = circuitBookings.reduce((sum, b) => sum + b.passengers, 0);
 
   const occupancy = React.useMemo(() => {
@@ -40,19 +41,10 @@ export function CircuitStatsTab({ circuit }: { circuit: CircuitRow }) {
     return totalSeats > 0 ? Math.round((bookedSeats / totalSeats) * 100) : 0;
   }, [circuit.circuit_departures]);
 
-  const avgRating = React.useMemo(() => {
-    const bookingIds = new Set(circuitBookings.map((b) => b.id));
-    const feedbacks = trips
-      .filter((t) => bookingIds.has(t.bookingId))
-      .flatMap((t) => t.feedbacks);
-    if (feedbacks.length === 0) return null;
-    return feedbacks.reduce((sum, f) => sum + f.rating, 0) / feedbacks.length;
-  }, [circuitBookings, trips]);
-
   const bookingsByMonth = React.useMemo(() => {
     const buckets = new Map<string, number>();
     circuitBookings.forEach((b) => {
-      const key = format(new Date(b.createdAt), "MMM yyyy", { locale: fr });
+      const key = format(new Date(b.created_at), "MMM yyyy", { locale: fr });
       buckets.set(key, (buckets.get(key) ?? 0) + 1);
     });
     return Array.from(buckets.entries())

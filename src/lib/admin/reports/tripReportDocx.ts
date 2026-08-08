@@ -5,15 +5,18 @@ import {
   getTripGeneralInfo,
   getRegistrationStats,
   getPreDepartureTasksSummary,
-  getSupplierInvolvement,
+  getTripSupplierTags,
   getItineraryVsActual,
   getGuideEngagementStats,
   getFeedbackAggregation,
   getFinancialSummary,
-} from "@/lib/admin/store/trips-store";
-import { Trip, TripReport } from "@/lib/admin/types";
+  type ItineraryDayInfo,
+} from "@/lib/admin/reports/trip-report-data";
+import type { TripReportManualFields } from "@/lib/admin/types";
+import type { TripRow, TripReportRow } from "@/lib/server/trips";
+import type { BookingRow } from "@/lib/server/bookings";
 
-function formatDate(iso?: string) {
+function formatDate(iso?: string | null) {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
 }
@@ -32,8 +35,14 @@ function manualPara(label: string, value?: string) {
   return rowPara(label, value && value.trim() ? value : "—");
 }
 
-function sectionParagraphs(sectionKey: string, trip: Trip, report: TripReport): Paragraph[] {
-  const manual = report.manual;
+function sectionParagraphs(
+  sectionKey: string,
+  trip: TripRow,
+  report: TripReportRow,
+  booking: BookingRow | null,
+  itineraryDays: ItineraryDayInfo[],
+): Paragraph[] {
+  const manual = (report.manual ?? {}) as TripReportManualFields;
   switch (sectionKey) {
     case "INFOS_GENERALES": {
       const info = getTripGeneralInfo(trip);
@@ -53,7 +62,7 @@ function sectionParagraphs(sectionKey: string, trip: Trip, report: TripReport): 
         manualPara("Résultats de la campagne", manual.resultatsCampagne),
       ];
     case "INSCRIPTIONS_PARTICIPANTS": {
-      const stats = getRegistrationStats(trip);
+      const stats = getRegistrationStats(trip, booking);
       return [
         rowPara("Inscrits", stats.inscrits),
         rowPara("Total encaissé", formatXOF(stats.totalPaid)),
@@ -62,7 +71,7 @@ function sectionParagraphs(sectionKey: string, trip: Trip, report: TripReport): 
       ];
     }
     case "PREPARATIFS_DOCUMENTS": {
-      const summary = getPreDepartureTasksSummary(trip.id);
+      const summary = getPreDepartureTasksSummary(trip);
       return [
         rowPara("Taux de complétion", `${summary.completionRate}% (${summary.done}/${summary.total})`),
         manualPara("Appréciation des préparatifs", manual.appreciationPreparatifs),
@@ -82,9 +91,9 @@ function sectionParagraphs(sectionKey: string, trip: Trip, report: TripReport): 
         manualPara("Incidents à l'arrivée", manual.incidentsArrivee),
       ];
     case "HEBERGEMENT": {
-      const suppliers = getSupplierInvolvement(trip.id, "HEBERGEMENT");
+      const tags = getTripSupplierTags(trip);
       return [
-        rowPara("Fournisseurs", suppliers.length > 0 ? suppliers.map((s) => s.name).join(", ") : "—"),
+        rowPara("Fournisseurs", tags.length > 0 ? tags.join(", ") : "—"),
         manualPara("Qualité perçue", manual.qualitePerçueHebergement ? `${manual.qualitePerçueHebergement}/5` : undefined),
         manualPara("Notes hébergement", manual.notesHebergement),
       ];
@@ -92,18 +101,18 @@ function sectionParagraphs(sectionKey: string, trip: Trip, report: TripReport): 
     case "RESTAURATION":
       return [manualPara("Notes restauration", manual.notesRestauration)];
     case "DEPLACEMENTS": {
-      const suppliers = getSupplierInvolvement(trip.id, "TRANSPORT");
+      const tags = getTripSupplierTags(trip);
       return [
-        rowPara("Fournisseurs", suppliers.length > 0 ? suppliers.map((s) => s.name).join(", ") : "—"),
+        rowPara("Fournisseurs", tags.length > 0 ? tags.join(", ") : "—"),
         manualPara("Fiabilité", manual.fiabiliteTransport ? `${manual.fiabiliteTransport}/5` : undefined),
         manualPara("Incidents transport", manual.incidentsTransport),
       ];
     }
     case "PROGRAMME_ACTIVITES": {
-      const { prevu, reel } = getItineraryVsActual(trip);
+      const { prevu, reel } = getItineraryVsActual(trip, itineraryDays);
       return [
         rowPara("Programme prévu", prevu.length > 0 ? prevu.map((d) => `J${d.day}. ${d.title}`).join(" · ") : "—"),
-        rowPara("Déroulé réel", reel.length > 0 ? reel.map((u) => `${formatDate(u.createdAt)} — ${u.message}`).join(" · ") : "—"),
+        rowPara("Déroulé réel", reel.length > 0 ? reel.map((u) => `${formatDate(u.created_at)} — ${u.message}`).join(" · ") : "—"),
         manualPara("Écarts par rapport au programme prévu", manual.ecartsProgramme),
       ];
     }
@@ -128,7 +137,7 @@ function sectionParagraphs(sectionKey: string, trip: Trip, report: TripReport): 
       ];
     }
     case "BILAN_FINANCIER": {
-      const summary = getFinancialSummary(trip);
+      const summary = getFinancialSummary(booking);
       return [
         rowPara("Budget prévu", formatXOF(summary.budgetPrevu)),
         rowPara("Encaissé", formatXOF(summary.encaisse)),
@@ -143,7 +152,17 @@ function sectionParagraphs(sectionKey: string, trip: Trip, report: TripReport): 
   }
 }
 
-export async function downloadTripReportDocx({ trip, report }: { trip: Trip; report: TripReport }) {
+export async function downloadTripReportDocx({
+  trip,
+  report,
+  booking,
+  itineraryDays,
+}: {
+  trip: TripRow;
+  report: TripReportRow;
+  booking: BookingRow | null;
+  itineraryDays: ItineraryDayInfo[];
+}) {
   const info = getTripGeneralInfo(trip);
   const logoBuffer = await fetch("/nomad-logo.jpg").then((r) => r.arrayBuffer());
 
@@ -182,7 +201,7 @@ export async function downloadTripReportDocx({ trip, report }: { trip: Trip; rep
         children: [new TextRun(s.title)],
       })
     );
-    children.push(...sectionParagraphs(s.key, trip, report));
+    children.push(...sectionParagraphs(s.key, trip, report, booking, itineraryDays));
   });
 
   const doc = new Document({ sections: [{ children }] });

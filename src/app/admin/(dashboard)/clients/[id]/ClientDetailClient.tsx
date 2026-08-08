@@ -19,9 +19,6 @@ import {
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { TagListInput } from "@/components/admin/TagListInput";
 import { useAdminRole } from "@/context/AdminRoleContext";
-import { useBookingsStore } from "@/lib/admin/store/bookings-store";
-import { useSupportStore } from "@/lib/admin/store/support-store";
-import { useTrips } from "@/lib/admin/store/trips-store";
 import { VIP_TIERS, VipTier, tierRank } from "@/lib/admin/loyalty";
 import { updateClientAction, addClientNoteAction } from "../actions";
 import type { Tables } from "@/lib/server/types";
@@ -29,6 +26,8 @@ import type { Tables } from "@/lib/server/types";
 type ContactMethod = "EMAIL" | "PHONE" | "WHATSAPP";
 type ClientRow = Tables<"clients"> & { client_notes: Tables<"client_notes">[] };
 type LoyaltyOfferRow = Tables<"loyalty_offers">;
+type BookingRow = Tables<"bookings">;
+type SupportTicketRow = Tables<"support_tickets">;
 
 function formatXOF(n: number) {
   return `${n.toLocaleString("fr-FR")} FCFA`;
@@ -50,12 +49,21 @@ const TIER_LABELS: Record<VipTier, string> = {
   PLATINUM: "Platine",
 };
 
-export function ClientDetailClient({ client, loyaltyOffers }: { client: ClientRow; loyaltyOffers: LoyaltyOfferRow[] }) {
+export function ClientDetailClient({
+  client,
+  loyaltyOffers,
+  feedbacks,
+  bookings,
+  tickets,
+}: {
+  client: ClientRow;
+  loyaltyOffers: LoyaltyOfferRow[];
+  feedbacks: { rating: number }[];
+  bookings: BookingRow[];
+  tickets: SupportTicketRow[];
+}) {
   const router = useRouter();
   const { user } = useAdminRole();
-  const bookingsStore = useBookingsStore();
-  const supportStore = useSupportStore();
-  const trips = useTrips();
 
   const [form, setForm] = React.useState({
     name: client.name,
@@ -71,12 +79,10 @@ export function ClientDetailClient({ client, loyaltyOffers }: { client: ClientRo
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const clientBookings = bookingsStore.bookings.filter((b) => b.client.id === client.id);
+  const clientBookings = bookings;
   const notes = client.client_notes;
-  const clientTickets = supportStore.tickets.filter((t) => t.client.id === client.id);
-  const clientBookingIds = new Set(clientBookings.map((b) => b.id));
-  const clientFeedbacks = trips.filter((t) => clientBookingIds.has(t.bookingId)).flatMap((t) => t.feedbacks);
-  const avgRating = clientFeedbacks.length > 0 ? (clientFeedbacks.reduce((s, f) => s + f.rating, 0) / clientFeedbacks.length).toFixed(1) : "—";
+  const clientTickets = tickets;
+  const avgRating = feedbacks.length > 0 ? (feedbacks.reduce((s, f) => s + f.rating, 0) / feedbacks.length).toFixed(1) : "—";
   const eligibleOffers = loyaltyOffers.filter((o) => o.active && tierRank(o.tier_required as VipTier) <= tierRank(client.vip_tier as VipTier));
 
   async function handleSave() {
@@ -198,9 +204,9 @@ export function ClientDetailClient({ client, loyaltyOffers }: { client: ClientRo
               <CardHeader><CardTitle className="text-sm">Résumé</CardTitle></CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <div><p className="text-stone-400 text-xs dark:text-stone-500">Réservations</p><p className="font-bold text-stone-800 text-lg dark:text-stone-100">{clientBookings.length}</p></div>
-                <div><p className="text-stone-400 text-xs dark:text-stone-500">Valeur cumulée</p><p className="font-bold text-emerald-600 text-lg">{formatXOF(clientBookings.reduce((s, b) => s + b.paidXOF, 0))}</p></div>
+                <div><p className="text-stone-400 text-xs dark:text-stone-500">Valeur cumulée</p><p className="font-bold text-emerald-600 text-lg">{formatXOF(clientBookings.reduce((s, b) => s + b.paid_xof, 0))}</p></div>
                 <div><p className="text-stone-400 text-xs dark:text-stone-500">Client depuis</p><p className="font-medium text-stone-800 dark:text-stone-100">{formatDate(client.created_at)}</p></div>
-                <div><p className="text-stone-400 text-xs dark:text-stone-500">Satisfaction moyenne</p><p className="font-medium text-stone-800 dark:text-stone-100">{avgRating}{avgRating !== "—" ? "/5" : ""} <span className="text-xs text-stone-400 dark:text-stone-500">({clientFeedbacks.length} avis)</span></p></div>
+                <div><p className="text-stone-400 text-xs dark:text-stone-500">Satisfaction moyenne</p><p className="font-medium text-stone-800 dark:text-stone-100">{avgRating}{avgRating !== "—" ? "/5" : ""} <span className="text-xs text-stone-400 dark:text-stone-500">({feedbacks.length} avis)</span></p></div>
               </CardContent>
             </Card>
           </div>
@@ -218,12 +224,12 @@ export function ClientDetailClient({ client, loyaltyOffers }: { client: ClientRo
                   className="flex items-center justify-between rounded-lg border border-stone-100 px-3 py-2.5 hover:border-luxe-terracotta/40 hover:bg-luxe-terracotta/5 transition-colors dark:border-stone-800"
                 >
                   <div>
-                    <p className="text-sm font-medium text-stone-800 font-mono dark:text-stone-100">{b.bookingNumber}</p>
-                    <p className="text-xs text-stone-400 dark:text-stone-500">{b.referenceLabel} — {formatDate(b.departDate)}</p>
+                    <p className="text-sm font-medium text-stone-800 font-mono dark:text-stone-100">{b.booking_number}</p>
+                    <p className="text-xs text-stone-400 dark:text-stone-500">{b.reference_label} — {b.depart_date ? formatDate(b.depart_date) : "—"}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <StatusBadge status={b.status} />
-                    <span className="text-sm font-semibold text-stone-800 dark:text-stone-100">{formatXOF(b.totalPriceXOF)}</span>
+                    <span className="text-sm font-semibold text-stone-800 dark:text-stone-100">{formatXOF(b.total_price_xof)}</span>
                   </div>
                 </Link>
               ))}
@@ -244,7 +250,7 @@ export function ClientDetailClient({ client, loyaltyOffers }: { client: ClientRo
                 >
                   <div>
                     <p className="text-sm font-medium text-stone-800 dark:text-stone-100">{t.subject}</p>
-                    <p className="text-xs text-stone-400 dark:text-stone-500">{formatDate(t.updatedAt)}</p>
+                    <p className="text-xs text-stone-400 dark:text-stone-500">{formatDate(t.updated_at)}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <StatusBadge status={t.type} />

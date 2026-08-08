@@ -1,5 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
-import type { TablesInsert, TablesUpdate } from "./types";
+import type { Tables, TablesInsert, TablesUpdate } from "./types";
+
+type FlightClientRef = Pick<Tables<"clients">, "id" | "name" | "email" | "phone">;
+
+export type FlightBookingRow = Tables<"flight_bookings"> & {
+  clients: FlightClientRef | null;
+};
+
+const LIST_RELATIONS = "*, clients(id,name,email,phone)";
+
+export async function listFlightBookings() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("flight_bookings")
+    .select(LIST_RELATIONS)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data as FlightBookingRow[];
+}
 
 export async function listFlightBookingsForClient(clientId: string) {
   const supabase = await createClient();

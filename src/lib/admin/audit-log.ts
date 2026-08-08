@@ -1,112 +1,107 @@
-"use client";
-import * as React from "react";
-import { useBookingsStore } from "@/lib/admin/store/bookings-store";
-import { useVisasStore } from "@/lib/admin/store/visas-store";
-import { useEventsStore } from "@/lib/admin/store/events-store";
-import { useSupportStore } from "@/lib/admin/store/support-store";
-import { useTripsStore } from "@/lib/admin/store/trips-store";
+import { createClient } from "@/lib/supabase/server";
+import type { AuditLogEntry } from "./audit-log-types";
 
-export type AuditLogSource = "RESERVATION" | "VISA" | "EVENEMENT" | "SUPPORT" | "VOYAGE";
+export type { AuditLogSource, AuditLogEntry } from "./audit-log-types";
+export { AUDIT_SOURCE_LABELS } from "./audit-log-types";
 
-export interface AuditLogEntry {
-  id: string;
-  source: AuditLogSource;
-  label: string;
-  detail?: string;
-  actor: string;
-  entityLabel: string;
-  href: string;
-  createdAt: string;
-}
+export async function getAuditLog(): Promise<AuditLogEntry[]> {
+  const supabase = await createClient();
 
-export const AUDIT_SOURCE_LABELS: Record<AuditLogSource, string> = {
-  RESERVATION: "Réservation",
-  VISA: "Visa",
-  EVENEMENT: "Événementiel",
-  SUPPORT: "Support",
-  VOYAGE: "Voyage",
-};
+  const [bookingTimeline, visaTimeline, eventTimeline, ticketTimeline, tripTimeline] = await Promise.all([
+    supabase
+      .from("booking_timeline")
+      .select("*, bookings(booking_number, reference_label)")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("visa_timeline")
+      .select("*, visa_requests(country, clients(name))")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("event_timeline")
+      .select("*, event_requests(type, clients(name))")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("ticket_timeline")
+      .select("*, support_tickets(subject)")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("trip_timeline")
+      .select("*, trips(bookings(reference_label))")
+      .order("date", { ascending: false }),
+  ]);
 
-export function useAuditLog(): AuditLogEntry[] {
-  const bookings = useBookingsStore();
-  const visas = useVisasStore();
-  const events = useEventsStore();
-  const support = useSupportStore();
-  const trips = useTripsStore();
+  if (bookingTimeline.error) throw bookingTimeline.error;
+  if (visaTimeline.error) throw visaTimeline.error;
+  if (eventTimeline.error) throw eventTimeline.error;
+  if (ticketTimeline.error) throw ticketTimeline.error;
+  if (tripTimeline.error) throw tripTimeline.error;
 
-  return React.useMemo(() => {
-    const entries: AuditLogEntry[] = [];
+  const entries: AuditLogEntry[] = [];
 
-    for (const t of bookings.timeline) {
-      const booking = bookings.bookings.find((b) => b.id === t.bookingId);
-      entries.push({
-        id: t.id,
-        source: "RESERVATION",
-        label: t.label,
-        detail: t.detail,
-        actor: t.actor,
-        entityLabel: booking ? `${booking.bookingNumber} — ${booking.referenceLabel}` : t.bookingId,
-        href: `/admin/reservations/${t.bookingId}`,
-        createdAt: t.createdAt,
-      });
-    }
+  for (const t of bookingTimeline.data) {
+    entries.push({
+      id: t.id,
+      source: "RESERVATION",
+      label: t.label,
+      detail: t.detail ?? undefined,
+      actor: t.actor,
+      entityLabel: t.bookings ? `${t.bookings.booking_number} — ${t.bookings.reference_label}` : t.booking_id,
+      href: `/admin/reservations/${t.booking_id}`,
+      createdAt: t.created_at,
+    });
+  }
 
-    for (const t of visas.timeline) {
-      const visa = visas.requests.find((v) => v.id === t.visaRequestId);
-      entries.push({
-        id: t.id,
-        source: "VISA",
-        label: t.label,
-        detail: t.detail,
-        actor: t.actor,
-        entityLabel: visa ? `${visa.client.name} — ${visa.country}` : t.visaRequestId,
-        href: `/admin/visas/${t.visaRequestId}`,
-        createdAt: t.createdAt,
-      });
-    }
+  for (const t of visaTimeline.data) {
+    entries.push({
+      id: t.id,
+      source: "VISA",
+      label: t.label,
+      detail: t.detail ?? undefined,
+      actor: t.actor,
+      entityLabel: t.visa_requests ? `${t.visa_requests.clients?.name ?? "—"} — ${t.visa_requests.country}` : t.visa_request_id,
+      href: `/admin/visas/${t.visa_request_id}`,
+      createdAt: t.created_at,
+    });
+  }
 
-    for (const t of events.timeline) {
-      const event = events.requests.find((e) => e.id === t.eventRequestId);
-      entries.push({
-        id: t.id,
-        source: "EVENEMENT",
-        label: t.label,
-        detail: t.detail,
-        actor: t.actor,
-        entityLabel: event ? `${event.client.name} — ${event.type}` : t.eventRequestId,
-        href: `/admin/evenementiel/${t.eventRequestId}`,
-        createdAt: t.createdAt,
-      });
-    }
+  for (const t of eventTimeline.data) {
+    entries.push({
+      id: t.id,
+      source: "EVENEMENT",
+      label: t.label,
+      detail: t.detail ?? undefined,
+      actor: t.actor,
+      entityLabel: t.event_requests ? `${t.event_requests.clients?.name ?? "—"} — ${t.event_requests.type}` : t.event_request_id,
+      href: `/admin/evenementiel/${t.event_request_id}`,
+      createdAt: t.created_at,
+    });
+  }
 
-    for (const t of support.timeline) {
-      const ticket = support.tickets.find((tk) => tk.id === t.ticketId);
-      entries.push({
-        id: t.id,
-        source: "SUPPORT",
-        label: t.label,
-        detail: t.detail,
-        actor: t.actor ?? "Système",
-        entityLabel: ticket ? ticket.subject : t.ticketId,
-        href: `/admin/support/${t.ticketId}`,
-        createdAt: t.createdAt,
-      });
-    }
+  for (const t of ticketTimeline.data) {
+    entries.push({
+      id: t.id,
+      source: "SUPPORT",
+      label: t.label,
+      detail: t.detail ?? undefined,
+      actor: t.actor ?? "Système",
+      entityLabel: t.support_tickets ? t.support_tickets.subject : t.ticket_id,
+      href: `/admin/support/${t.ticket_id}`,
+      createdAt: t.created_at,
+    });
+  }
 
-    for (const t of trips.tripTimeline) {
-      const trip = trips.trips.find((tr) => tr.id === t.tripId);
-      entries.push({
-        id: t.id,
-        source: "VOYAGE",
-        label: t.label,
-        detail: t.detail,
-        actor: t.actor ?? "Système",
-        entityLabel: trip ? trip.title : t.tripId,
-        href: `/admin/voyages/${t.tripId}`,
-        createdAt: t.date,
-      });
-    }
+  for (const t of tripTimeline.data) {
+    entries.push({
+      id: t.id,
+      source: "VOYAGE",
+      label: t.label,
+      detail: t.detail ?? undefined,
+      actor: t.actor ?? "Système",
+      entityLabel: t.trips?.bookings?.reference_label ?? "Voyage",
+      href: `/admin/voyages/${t.trip_id}`,
+      createdAt: t.date,
+    });
+  }
 
-    return entries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [bookings, visas, events, support, trips]);
+  return entries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }

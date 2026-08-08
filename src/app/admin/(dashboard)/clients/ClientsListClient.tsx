@@ -14,18 +14,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useBookingsStore } from "@/lib/admin/store/bookings-store";
 import type { Tables } from "@/lib/server/types";
+import type { listBookingStats } from "@/lib/server/bookings";
 
 export type ClientRow = Tables<"clients">;
+type BookingStats = Awaited<ReturnType<typeof listBookingStats>>;
 
 function formatXOF(n: number) {
   return `${n.toLocaleString("fr-FR")} FCFA`;
 }
 
-export function ClientsListClient({ clients }: { clients: ClientRow[] }) {
+export function ClientsListClient({ clients, bookingStats }: { clients: ClientRow[]; bookingStats: BookingStats }) {
   const router = useRouter();
-  const bookings = useBookingsStore();
   const [search, setSearch] = React.useState("");
   const [tag, setTag] = React.useState("ALL");
 
@@ -36,14 +36,14 @@ export function ClientsListClient({ clients }: { clients: ClientRow[] }) {
 
   const stats = React.useMemo(() => {
     const map = new Map<string, { count: number; lifetimeValue: number }>();
-    bookings.bookings.forEach((b) => {
-      const entry = map.get(b.client.id) ?? { count: 0, lifetimeValue: 0 };
+    bookingStats.forEach((b) => {
+      const entry = map.get(b.client_id) ?? { count: 0, lifetimeValue: 0 };
       entry.count += 1;
-      entry.lifetimeValue += b.paidXOF;
-      map.set(b.client.id, entry);
+      entry.lifetimeValue += b.paid_xof;
+      map.set(b.client_id, entry);
     });
     return map;
-  }, [bookings.bookings]);
+  }, [bookingStats]);
 
   const filtered = React.useMemo(() => {
     return clients.filter((c) => {

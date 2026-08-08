@@ -5,15 +5,18 @@ import {
   getTripGeneralInfo,
   getRegistrationStats,
   getPreDepartureTasksSummary,
-  getSupplierInvolvement,
+  getTripSupplierTags,
   getItineraryVsActual,
   getGuideEngagementStats,
   getFeedbackAggregation,
   getFinancialSummary,
-} from "@/lib/admin/store/trips-store";
-import { Trip, TripReport } from "@/lib/admin/types";
+  type ItineraryDayInfo,
+} from "@/lib/admin/reports/trip-report-data";
+import type { TripReportManualFields } from "@/lib/admin/types";
+import type { TripRow, TripReportRow } from "@/lib/server/trips";
+import type { BookingRow } from "@/lib/server/bookings";
 
-function formatDate(iso?: string) {
+function formatDate(iso?: string | null) {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
 }
@@ -63,8 +66,14 @@ function ManualText({ label, value }: { label: string; value?: string }) {
   );
 }
 
-function sectionBody(sectionKey: string, trip: Trip, report: TripReport) {
-  const manual = report.manual;
+function sectionBody(
+  sectionKey: string,
+  trip: TripRow,
+  report: TripReportRow,
+  booking: BookingRow | null,
+  itineraryDays: ItineraryDayInfo[],
+) {
+  const manual = (report.manual ?? {}) as TripReportManualFields;
   switch (sectionKey) {
     case "INFOS_GENERALES": {
       const info = getTripGeneralInfo(trip);
@@ -89,7 +98,7 @@ function sectionBody(sectionKey: string, trip: Trip, report: TripReport) {
         </>
       );
     case "INSCRIPTIONS_PARTICIPANTS": {
-      const stats = getRegistrationStats(trip);
+      const stats = getRegistrationStats(trip, booking);
       return (
         <>
           <Row label="Inscrits" value={stats.inscrits} />
@@ -101,7 +110,7 @@ function sectionBody(sectionKey: string, trip: Trip, report: TripReport) {
       );
     }
     case "PREPARATIFS_DOCUMENTS": {
-      const summary = getPreDepartureTasksSummary(trip.id);
+      const summary = getPreDepartureTasksSummary(trip);
       return (
         <>
           <Row label="Taux de complétion" value={`${summary.completionRate}% (${summary.done}/${summary.total})`} />
@@ -128,14 +137,14 @@ function sectionBody(sectionKey: string, trip: Trip, report: TripReport) {
         </>
       );
     case "HEBERGEMENT": {
-      const suppliers = getSupplierInvolvement(trip.id, "HEBERGEMENT");
+      const tags = getTripSupplierTags(trip);
       return (
         <>
           <Text style={styles.blockTitle}>Fournisseurs</Text>
-          {suppliers.length === 0 ? (
+          {tags.length === 0 ? (
             <Text style={styles.emptyText}>Aucun fournisseur lié.</Text>
           ) : (
-            suppliers.map((s) => <Text key={s.id} style={styles.value}>{s.name}</Text>)
+            tags.map((tag) => <Text key={tag} style={styles.value}>{tag}</Text>)
           )}
           <View style={styles.divider} />
           <ManualText label="Qualité perçue" value={manual.qualitePerçueHebergement ? `${manual.qualitePerçueHebergement}/5` : undefined} />
@@ -146,14 +155,14 @@ function sectionBody(sectionKey: string, trip: Trip, report: TripReport) {
     case "RESTAURATION":
       return <ManualText label="Notes restauration" value={manual.notesRestauration} />;
     case "DEPLACEMENTS": {
-      const suppliers = getSupplierInvolvement(trip.id, "TRANSPORT");
+      const tags = getTripSupplierTags(trip);
       return (
         <>
           <Text style={styles.blockTitle}>Fournisseurs</Text>
-          {suppliers.length === 0 ? (
+          {tags.length === 0 ? (
             <Text style={styles.emptyText}>Aucun fournisseur lié.</Text>
           ) : (
-            suppliers.map((s) => <Text key={s.id} style={styles.value}>{s.name}</Text>)
+            tags.map((tag) => <Text key={tag} style={styles.value}>{tag}</Text>)
           )}
           <View style={styles.divider} />
           <ManualText label="Fiabilité" value={manual.fiabiliteTransport ? `${manual.fiabiliteTransport}/5` : undefined} />
@@ -162,7 +171,7 @@ function sectionBody(sectionKey: string, trip: Trip, report: TripReport) {
       );
     }
     case "PROGRAMME_ACTIVITES": {
-      const { prevu, reel } = getItineraryVsActual(trip);
+      const { prevu, reel } = getItineraryVsActual(trip, itineraryDays);
       return (
         <>
           <Text style={styles.blockTitle}>Programme prévu</Text>
@@ -175,7 +184,7 @@ function sectionBody(sectionKey: string, trip: Trip, report: TripReport) {
           {reel.length === 0 ? (
             <Text style={styles.emptyText}>Aucune mise à jour publiée pendant le voyage.</Text>
           ) : (
-            reel.map((u) => <Text key={u.id} style={styles.value}>{formatDate(u.createdAt)} — {u.message}</Text>)
+            reel.map((u) => <Text key={u.id} style={styles.value}>{formatDate(u.created_at)} — {u.message}</Text>)
           )}
           <View style={styles.divider} />
           <ManualText label="Écarts par rapport au programme prévu" value={manual.ecartsProgramme} />
@@ -220,7 +229,7 @@ function sectionBody(sectionKey: string, trip: Trip, report: TripReport) {
       );
     }
     case "BILAN_FINANCIER": {
-      const summary = getFinancialSummary(trip);
+      const summary = getFinancialSummary(booking);
       return (
         <>
           <Row label="Budget prévu" value={formatXOF(summary.budgetPrevu)} />
@@ -238,7 +247,19 @@ function sectionBody(sectionKey: string, trip: Trip, report: TripReport) {
   }
 }
 
-function TripReportPdfDocument({ trip, report, logoUrl }: { trip: Trip; report: TripReport; logoUrl: string }) {
+function TripReportPdfDocument({
+  trip,
+  report,
+  booking,
+  itineraryDays,
+  logoUrl,
+}: {
+  trip: TripRow;
+  report: TripReportRow;
+  booking: BookingRow | null;
+  itineraryDays: ItineraryDayInfo[];
+  logoUrl: string;
+}) {
   const info = getTripGeneralInfo(trip);
   return (
     <Document>
@@ -262,16 +283,28 @@ function TripReportPdfDocument({ trip, report, logoUrl }: { trip: Trip; report: 
         <Page key={s.key} size="A4" style={styles.page}>
           <Text style={styles.pageHeader}>{info.circuitName} — Rapport de voyage</Text>
           <Text style={styles.sectionTitle}>{s.title}</Text>
-          {sectionBody(s.key, trip, report)}
+          {sectionBody(s.key, trip, report, booking, itineraryDays)}
         </Page>
       ))}
     </Document>
   );
 }
 
-export async function downloadTripReportPdf({ trip, report }: { trip: Trip; report: TripReport }) {
+export async function downloadTripReportPdf({
+  trip,
+  report,
+  booking,
+  itineraryDays,
+}: {
+  trip: TripRow;
+  report: TripReportRow;
+  booking: BookingRow | null;
+  itineraryDays: ItineraryDayInfo[];
+}) {
   const logoUrl = `${window.location.origin}/nomad-logo.jpg`;
-  const blob = await pdf(<TripReportPdfDocument trip={trip} report={report} logoUrl={logoUrl} />).toBlob();
+  const blob = await pdf(
+    <TripReportPdfDocument trip={trip} report={report} booking={booking} itineraryDays={itineraryDays} logoUrl={logoUrl} />,
+  ).toBlob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

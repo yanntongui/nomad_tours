@@ -1,18 +1,23 @@
-"use client";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, Clock, User, ChevronRight, ArrowLeft, Share2, Compass } from "lucide-react";
-import { BLOG_POSTS } from "@/lib/data/blog-posts";
-import { useQuoteModal } from "@/context/QuoteModalContext";
+import { Calendar, Clock, User, ChevronRight } from "lucide-react";
+import { getBlogPostBySlug } from "@/lib/server/blog";
+import { BlogQuoteCta } from "./BlogQuoteCta";
 
 interface BlogPostPageProps {
   params: { slug: string };
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const { openQuoteModal: onOpenQuoteModal } = useQuoteModal();
-  const post = BLOG_POSTS.find((p) => p.slug === params.slug || p.id === params.slug);
+function formatPublishedDate(publishedAt: string | null) {
+  if (!publishedAt) return "";
+  return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" }).format(
+    new Date(publishedAt)
+  );
+}
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const post = await getBlogPostBySlug(params.slug);
 
   if (!post) {
     return (
@@ -46,22 +51,22 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         </h1>
         <div className="flex flex-wrap items-center gap-4 text-xs text-stone-500 pt-2 border-t border-stone-200">
           <span className="flex items-center gap-1 font-semibold text-nomad-navy">
-            <User className="w-4 h-4 text-nomad-terracotta" /> {post.authorName}
+            <User className="w-4 h-4 text-nomad-terracotta" /> {post.author_name}
           </span>
           <span>•</span>
           <span className="flex items-center gap-1">
-            <Calendar className="w-4 h-4 text-nomad-gold" /> {post.publishedAt}
+            <Calendar className="w-4 h-4 text-nomad-gold" /> {formatPublishedDate(post.published_at)}
           </span>
           <span>•</span>
           <span className="flex items-center gap-1">
-            <Clock className="w-4 h-4 text-nomad-terracotta" /> {post.readTimeMinutes} min de lecture
+            <Clock className="w-4 h-4 text-nomad-terracotta" /> {post.read_time_minutes} min de lecture
           </span>
         </div>
       </div>
 
       {/* Cover Image */}
       <div className="relative h-[380px] rounded-3xl overflow-hidden shadow-lg bg-stone-900">
-        <Image src={post.coverImage} alt={post.title} fill className="object-cover" />
+        <Image src={post.cover_image} alt={post.title} fill className="object-cover" />
       </div>
 
       {/* Article Content */}
@@ -75,12 +80,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         <p className="text-xs text-stone-300 max-w-md mx-auto">
           Nos conseillers locaux organisent votre itinéraire sur-mesure au meilleur tarif.
         </p>
-        <button
-          onClick={() => onOpenQuoteModal && onOpenQuoteModal()}
-          className="bg-nomad-terracotta hover:bg-nomad-terracotta-dark text-white font-bold text-sm px-6 py-3 rounded-xl shadow transition"
-        >
-          Demander un Devis Gratuit
-        </button>
+        <BlogQuoteCta />
       </div>
     </div>
   );

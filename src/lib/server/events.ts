@@ -1,18 +1,31 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Tables, TablesInsert, TablesUpdate } from "./types";
 
+type EventClientRef = Pick<Tables<"clients">, "id" | "name" | "email" | "phone">;
+type EventAgentRef = Pick<Tables<"admin_profiles">, "id" | "name">;
+
 export type EventRequestRow = Tables<"event_requests"> & {
   event_timeline: Tables<"event_timeline">[];
+  clients: EventClientRef | null;
+  admin_profiles: EventAgentRef | null;
 };
+
+export type EventListRow = Tables<"event_requests"> & {
+  clients: EventClientRef | null;
+  admin_profiles: EventAgentRef | null;
+};
+
+const LIST_RELATIONS = "*, clients(id,name,email,phone), admin_profiles(id,name)";
+const WITH_RELATIONS = "*, event_timeline(*), clients(id,name,email,phone), admin_profiles(id,name)";
 
 export async function listEventRequests() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("event_requests")
-    .select("*")
+    .select(LIST_RELATIONS)
     .order("event_date", { ascending: false });
   if (error) throw error;
-  return data;
+  return data as EventListRow[];
 }
 
 export async function listEventRequestsForClient(clientId: string) {
@@ -30,7 +43,7 @@ export async function getEventRequest(id: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("event_requests")
-    .select("*, event_timeline(*)")
+    .select(WITH_RELATIONS)
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
@@ -65,10 +78,21 @@ export async function updateEventRequest(
   return data;
 }
 
+const STATUS_LABELS: Record<Tables<"event_requests">["status"], string> = {
+  DRAFT: "Repassé en brouillon",
+  REQUESTED: "Demande confirmée par le client",
+  QUOTED: "Devis envoyé",
+  CONFIRMED: "Événement confirmé",
+  IN_PROGRESS: "Événement en cours",
+  COMPLETED: "Événement terminé",
+  CANCELLED: "Événement annulé",
+};
+
 export async function advanceEventStatus(
   id: string,
   status: Tables<"event_requests">["status"],
   actor: string,
+  reason?: string,
 ) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -78,7 +102,7 @@ export async function advanceEventStatus(
     .select()
     .single();
   if (error) throw error;
-  await logEventTimeline(id, actor, `Statut changé: ${status}`);
+  await logEventTimeline(id, actor, STATUS_LABELS[status], reason);
   return data;
 }
 

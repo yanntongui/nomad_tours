@@ -1,8 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { updateClient, addClientNote } from "@/lib/server/clients";
-import type { TablesUpdate } from "@/lib/server/types";
+import { updateClient, addClientNote, createClientRecord } from "@/lib/server/clients";
+import type { TablesInsert, TablesUpdate } from "@/lib/server/types";
+
+export async function createClientAction(client: TablesInsert<"clients">) {
+  try {
+    const data = await createClientRecord(client);
+    revalidatePath("/admin/clients");
+    return { data };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Erreur inconnue" };
+  }
+}
 
 export async function updateClientAction(id: string, patch: TablesUpdate<"clients">) {
   try {

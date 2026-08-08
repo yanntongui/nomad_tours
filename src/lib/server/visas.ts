@@ -1,21 +1,33 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Tables, TablesInsert, TablesUpdate } from "./types";
 
+type VisaClientRef = Pick<Tables<"clients">, "id" | "name" | "email" | "phone">;
+type VisaAgentRef = Pick<Tables<"admin_profiles">, "id" | "name">;
+
 export type VisaRequestRow = Tables<"visa_requests"> & {
   visa_documents: Tables<"visa_documents">[];
   visa_timeline: Tables<"visa_timeline">[];
+  clients: VisaClientRef | null;
+  admin_profiles: VisaAgentRef | null;
 };
 
-const WITH_RELATIONS = "*, visa_documents(*), visa_timeline(*)";
+export type VisaListRow = Tables<"visa_requests"> & {
+  clients: VisaClientRef | null;
+  admin_profiles: VisaAgentRef | null;
+};
+
+const LIST_RELATIONS = "*, clients(id,name,email,phone), admin_profiles(id,name)";
+const WITH_RELATIONS =
+  "*, visa_documents(*), visa_timeline(*), clients(id,name,email,phone), admin_profiles(id,name)";
 
 export async function listVisaRequests() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("visa_requests")
-    .select("*")
+    .select(LIST_RELATIONS)
     .order("submitted_at", { ascending: false });
   if (error) throw error;
-  return data;
+  return data as VisaListRow[];
 }
 
 export async function listVisaRequestsForClient(clientId: string) {
@@ -68,20 +80,28 @@ export async function updateVisaRequest(
   return data;
 }
 
+const STATUS_LABELS: Record<Tables<"visa_requests">["status"], string> = {
+  SUBMITTED: "Dossier soumis",
+  PROCESSING: "Passé en traitement",
+  APPROVED: "Visa approuvé",
+  REJECTED: "Visa rejeté",
+};
+
 export async function advanceVisaStatus(
   id: string,
   status: Tables<"visa_requests">["status"],
   actor: string,
+  note?: string,
 ) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("visa_requests")
-    .update({ status })
+    .update({ status, ...(note !== undefined ? { admin_notes: note } : {}) })
     .eq("id", id)
     .select()
     .single();
   if (error) throw error;
-  await logVisaTimeline(id, actor, `Statut changé: ${status}`);
+  await logVisaTimeline(id, actor, STATUS_LABELS[status], note);
   return data;
 }
 

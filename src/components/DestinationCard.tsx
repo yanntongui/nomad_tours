@@ -3,11 +3,11 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Star, Calendar, ArrowRight, Sparkles } from "lucide-react";
-import { Destination } from "@/types";
+import type { DestinationRow } from "@/lib/server/destinations";
 import { useQuoteModal } from "@/context/QuoteModalContext";
 
 interface DestinationCardProps {
-  destination: Destination;
+  destination: DestinationRow;
   onOpenQuoteModal?: (destinationId: string) => void;
 }
 
@@ -30,10 +30,10 @@ export default function DestinationCard({ destination, onOpenQuoteModal }: Desti
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-        
+
         {/* Badges */}
         <div className="absolute top-3 left-3 flex gap-2">
-          {destination.isFeatured && (
+          {destination.is_featured && (
             <span className="bg-nomad-terracotta text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow flex items-center gap-1">
               <Sparkles className="w-3 h-3" /> Phare
             </span>
@@ -46,7 +46,7 @@ export default function DestinationCard({ destination, onOpenQuoteModal }: Desti
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-stone-900 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow">
           <Star className="w-3.5 h-3.5 fill-nomad-gold text-nomad-gold" />
           <span>{destination.rating}</span>
-          <span className="text-stone-400 font-normal text-[10px]">({destination.reviewsCount})</span>
+          <span className="text-stone-400 font-normal text-[10px]">({destination.reviews_count})</span>
         </div>
 
         <div className="absolute bottom-3 left-3 right-3 text-white">
@@ -87,7 +87,7 @@ export default function DestinationCard({ destination, onOpenQuoteModal }: Desti
 
         <div className="text-[11px] text-stone-500 flex items-center gap-1.5 pt-1 border-t border-stone-100">
           <Calendar className="w-3.5 h-3.5 text-nomad-terracotta shrink-0" />
-          <span>Période idéale : <strong>{destination.bestPeriod}</strong></span>
+          <span>Période idéale : <strong>{destination.best_period}</strong></span>
         </div>
 
         {/* Price & Action */}
@@ -95,7 +95,7 @@ export default function DestinationCard({ destination, onOpenQuoteModal }: Desti
           <div>
             <span className="text-[10px] text-stone-400 block uppercase font-semibold">À partir de</span>
             <span className="text-base font-extrabold text-nomad-navy">
-              {destination.startingPriceXOF.toLocaleString("fr-FR")} FCFA
+              {destination.starting_price_xof.toLocaleString("fr-FR")} FCFA
             </span>
           </div>
 

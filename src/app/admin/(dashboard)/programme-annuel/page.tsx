@@ -1,13 +1,26 @@
 import { listCircuits } from "@/lib/server/circuits";
 import { listDestinations } from "@/lib/server/destinations";
+import { listOngoingTripsForRisk } from "@/lib/server/trips";
 import { Circuit } from "@/lib/admin/types";
-import { ProgrammeAnnuelClient } from "./ProgrammeAnnuelClient";
+import { ActiveTripInfo, ProgrammeAnnuelClient } from "./ProgrammeAnnuelClient";
 
 export default async function ProgrammeAnnuelPage() {
-  const [circuitRows, destinations] = await Promise.all([
+  const [circuitRows, destinations, ongoingTrips] = await Promise.all([
     listCircuits(),
     listDestinations(),
+    listOngoingTripsForRisk(),
   ]);
+
+  const activeTrips: ActiveTripInfo[] = ongoingTrips
+    .filter((t) => t.bookings !== null)
+    .map((t) => ({
+      id: t.id,
+      circuitId: t.bookings!.reference_id,
+      hasIncompleteChecklist: t.trip_participants.some((p) =>
+        ((p.checklist as { label: string; done: boolean }[] | null) ?? []).some((c) => !c.done)
+      ),
+      tasks: t.trip_tasks.map((task) => ({ category: task.category, status: task.status, dueDate: task.due_date })),
+    }));
 
   const destinationNames: Record<string, string> = {};
   for (const destination of destinations) {
@@ -45,5 +58,5 @@ export default async function ProgrammeAnnuelPage() {
     updatedAt: row.updated_at,
   }));
 
-  return <ProgrammeAnnuelClient circuits={circuits} />;
+  return <ProgrammeAnnuelClient circuits={circuits} activeTrips={activeTrips} />;
 }

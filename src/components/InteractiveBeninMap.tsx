@@ -2,17 +2,19 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Sparkles, Star, Send, ChevronRight, Info } from "lucide-react";
-import { Destination } from "@/types";
+import { MapPin, Sparkles, Star, Send, Info } from "lucide-react";
+import type { DestinationRow } from "@/lib/server/destinations";
 
 interface InteractiveBeninMapProps {
-  destinations: Destination[];
+  destinations: DestinationRow[];
   onOpenQuoteModal?: (destinationId: string) => void;
 }
 
 export default function InteractiveBeninMap({ destinations, onOpenQuoteModal }: InteractiveBeninMapProps) {
-  const beninDestinations = destinations.filter((d) => !d.isInternational);
-  const [selectedDest, setSelectedDest] = useState<Destination>(beninDestinations[0] || destinations[0]);
+  const beninDestinations = destinations.filter((d) => !d.is_international);
+  const [selectedDest, setSelectedDest] = useState<DestinationRow | undefined>(
+    beninDestinations[0] || destinations[0]
+  );
 
   return (
     <div className="bg-gradient-to-br from-stone-900 to-nomad-navy rounded-3xl p-6 sm:p-8 text-white shadow-2xl overflow-hidden border border-stone-800">
@@ -42,14 +44,14 @@ export default function InteractiveBeninMap({ destinations, onOpenQuoteModal }: 
               const isSelected = selectedDest?.id === dest.id;
               // Approximate relative positions for Benin destinations
               let pinPos = { top: "50%", left: "50%" };
-              if (dest.id.includes("pendjari")) pinPos = { top: "15%", left: "45%" };
-              else if (dest.id.includes("natitingou")) pinPos = { top: "28%", left: "35%" };
-              else if (dest.id.includes("dassa")) pinPos = { top: "52%", left: "55%" };
-              else if (dest.id.includes("abomey")) pinPos = { top: "68%", left: "48%" };
-              else if (dest.id.includes("ganvie")) pinPos = { top: "82%", left: "58%" };
-              else if (dest.id.includes("porto-novo")) pinPos = { top: "84%", left: "70%" };
-              else if (dest.id.includes("ouidah")) pinPos = { top: "86%", left: "42%" };
-              else if (dest.id.includes("grand-popo")) pinPos = { top: "88%", left: "28%" };
+              if (dest.slug.includes("pendjari")) pinPos = { top: "15%", left: "45%" };
+              else if (dest.slug.includes("natitingou")) pinPos = { top: "28%", left: "35%" };
+              else if (dest.slug.includes("dassa")) pinPos = { top: "52%", left: "55%" };
+              else if (dest.slug.includes("abomey")) pinPos = { top: "68%", left: "48%" };
+              else if (dest.slug.includes("ganvie")) pinPos = { top: "82%", left: "58%" };
+              else if (dest.slug.includes("porto-novo")) pinPos = { top: "84%", left: "70%" };
+              else if (dest.slug.includes("ouidah")) pinPos = { top: "86%", left: "42%" };
+              else if (dest.slug.includes("grand-popo")) pinPos = { top: "88%", left: "28%" };
 
               return (
                 <button
@@ -133,7 +135,7 @@ export default function InteractiveBeninMap({ destinations, onOpenQuoteModal }: 
               <div>
                 <span className="text-[10px] text-stone-400 block uppercase">À partir de</span>
                 <span className="text-xl font-black text-nomad-gold">
-                  {selectedDest.startingPriceXOF.toLocaleString("fr-FR")} FCFA
+                  {selectedDest.starting_price_xof.toLocaleString("fr-FR")} FCFA
                 </span>
               </div>
 

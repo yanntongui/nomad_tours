@@ -37,6 +37,39 @@ export async function listBookings() {
   return data as BookingListRow[];
 }
 
+export async function listBookingStats() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("id, client_id, paid_xof");
+  if (error) throw error;
+  return data;
+}
+
+export async function listBookingsForCircuit(circuitId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("id, paid_xof, passengers, created_at")
+    .eq("type", "CIRCUIT")
+    .eq("reference_id", circuitId);
+  if (error) throw error;
+  return data;
+}
+
+export async function listBookingTimelineAll(limit: number) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("booking_timeline")
+    .select("*, bookings(id, booking_number, reference_label)")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data as (Tables<"booking_timeline"> & {
+    bookings: Pick<Tables<"bookings">, "id" | "booking_number" | "reference_label"> | null;
+  })[];
+}
+
 export async function listBookingsForClient(clientId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase

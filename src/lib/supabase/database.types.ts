@@ -766,10 +766,13 @@ export type Database = {
           latitude: number | null
           longitude: number | null
           name: string
+          rating: number
           region: string | null
+          reviews_count: number
           seo_description: string | null
           seo_title: string | null
           slug: string
+          starting_price_xof: number
           updated_at: string
         }
         Insert: {
@@ -786,10 +789,13 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           name: string
+          rating?: number
           region?: string | null
+          reviews_count?: number
           seo_description?: string | null
           seo_title?: string | null
           slug: string
+          starting_price_xof?: number
           updated_at?: string
         }
         Update: {
@@ -806,10 +812,13 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           name?: string
+          rating?: number
           region?: string | null
+          reviews_count?: number
           seo_description?: string | null
           seo_title?: string | null
           slug?: string
+          starting_price_xof?: number
           updated_at?: string
         }
         Relationships: []
@@ -1679,6 +1688,82 @@ export type Database = {
           },
         ]
       }
+      trip_report_action_items: {
+        Row: {
+          created_at: string
+          done: boolean
+          id: string
+          label: string
+          report_id: string
+        }
+        Insert: {
+          created_at?: string
+          done?: boolean
+          id?: string
+          label: string
+          report_id: string
+        }
+        Update: {
+          created_at?: string
+          done?: boolean
+          id?: string
+          label?: string
+          report_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_report_action_items_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "trip_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_reports: {
+        Row: {
+          finalized_at: string | null
+          finalized_by: string | null
+          generated_at: string
+          generated_by: string
+          id: string
+          manual: Json
+          status: Database["public"]["Enums"]["trip_report_status"]
+          trip_id: string
+          updated_at: string
+        }
+        Insert: {
+          finalized_at?: string | null
+          finalized_by?: string | null
+          generated_at?: string
+          generated_by: string
+          id?: string
+          manual?: Json
+          status?: Database["public"]["Enums"]["trip_report_status"]
+          trip_id: string
+          updated_at?: string
+        }
+        Update: {
+          finalized_at?: string | null
+          finalized_by?: string | null
+          generated_at?: string
+          generated_by?: string
+          id?: string
+          manual?: Json
+          status?: Database["public"]["Enums"]["trip_report_status"]
+          trip_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_reports_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: true
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_tasks: {
         Row: {
           assignee_id: string | null
@@ -2091,6 +2176,7 @@ export type Database = {
       ticket_priority: "NORMALE" | "URGENTE"
       ticket_status: "OUVERT" | "EN_COURS" | "RESOLU" | "FERME" | "REJETE"
       ticket_type: "SUPPORT" | "RECLAMATION"
+      trip_report_status: "DRAFT" | "FINALIZED"
       trip_status: "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED"
       trip_type: "INDIVIDUAL" | "GROUP"
       vip_tier: "STANDARD" | "SILVER" | "GOLD" | "PLATINUM"
@@ -2288,6 +2374,7 @@ export const Constants = {
       ticket_priority: ["NORMALE", "URGENTE"],
       ticket_status: ["OUVERT", "EN_COURS", "RESOLU", "FERME", "REJETE"],
       ticket_type: ["SUPPORT", "RECLAMATION"],
+      trip_report_status: ["DRAFT", "FINALIZED"],
       trip_status: ["UPCOMING", "ONGOING", "COMPLETED", "CANCELLED"],
       trip_type: ["INDIVIDUAL", "GROUP"],
       vip_tier: ["STANDARD", "SILVER", "GOLD", "PLATINUM"],

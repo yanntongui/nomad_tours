@@ -15,11 +15,13 @@ export function MonthCard({
   year,
   departures,
   now,
+  activeTripByCircuit,
 }: {
   month: number;
   year: number;
   departures: DepartureWithCircuit[];
   now: Date;
+  activeTripByCircuit: Map<string, { id: string }>;
 }) {
   const status = getMonthStatus(month, year, now);
   const label = format(new Date(year, month, 1), "MMMM", { locale: fr });
@@ -38,7 +40,14 @@ export function MonthCard({
         {sorted.length === 0 ? (
           <p className="py-6 text-center text-xs text-stone-400">Aucun départ programmé.</p>
         ) : (
-          sorted.map((d) => <CircuitBadge key={d.id} departure={d} now={now} />)
+          sorted.map((d) => (
+            <CircuitBadge
+              key={d.id}
+              departure={d}
+              now={now}
+              activeTripId={activeTripByCircuit.get(d.circuit.id)?.id}
+            />
+          ))
         )}
       </div>
     </div>

@@ -1,14 +1,25 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Send, CheckCircle2, Calendar, Users, Mail, Phone, User, Sparkles } from "lucide-react";
-import { DESTINATIONS } from "@/lib/data/destinations";
-import { CIRCUITS } from "@/lib/data/circuits";
+import { createClient } from "@/lib/supabase/client";
 
 interface QuoteModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialDestinationId?: string;
   initialCircuitId?: string;
+}
+
+interface DestinationOption {
+  id: string;
+  name: string;
+  country: string;
+}
+
+interface CircuitOption {
+  id: string;
+  title: string;
+  duration_days: number;
 }
 
 export default function QuoteModal({
@@ -26,6 +37,22 @@ export default function QuoteModal({
   const [passengersCount, setPassengersCount] = useState(2);
   const [notes, setNotes] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [destinations, setDestinations] = useState<DestinationOption[]>([]);
+  const [circuits, setCircuits] = useState<CircuitOption[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("destinations")
+      .select("id, name, country")
+      .order("name")
+      .then(({ data }) => data && setDestinations(data));
+    supabase
+      .from("circuits")
+      .select("id, title, duration_days")
+      .order("title")
+      .then(({ data }) => data && setCircuits(data));
+  }, []);
 
   if (!isOpen) return null;
 
@@ -63,7 +90,7 @@ export default function QuoteModal({
               <p className="font-bold text-nomad-navy flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5 text-nomad-gold" /> Récapitulatif de votre demande :
               </p>
-              <p>• Destination : {DESTINATIONS.find((d) => d.id === destinationId)?.name || "Sur-mesure"}</p>
+              <p>• Destination : {destinations.find((d) => d.id === destinationId)?.name || "Sur-mesure"}</p>
               <p>• Nombre de voyageurs : {passengersCount} personne(s)</p>
               <p>• Date souhaitée : {startDate || "Flexible"}</p>
               <p>• Contact : {email} ({phone})</p>
@@ -96,7 +123,7 @@ export default function QuoteModal({
                 className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-sm text-stone-800 focus:ring-2 focus:ring-nomad-terracotta outline-none"
               >
                 <option value="">Sélectionner une destination...</option>
-                {DESTINATIONS.map((d) => (
+                {destinations.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name} ({d.country})
                   </option>
@@ -113,9 +140,9 @@ export default function QuoteModal({
                 className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-sm text-stone-800 focus:ring-2 focus:ring-nomad-terracotta outline-none"
               >
                 <option value="">Création d&apos;itinéraire sur-mesure</option>
-                {CIRCUITS.map((c) => (
+                {circuits.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.title} ({c.durationDays} Jours)
+                    {c.title} ({c.duration_days} Jours)
                   </option>
                 ))}
               </select>

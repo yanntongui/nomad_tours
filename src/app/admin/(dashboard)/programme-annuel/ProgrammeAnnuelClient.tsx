@@ -9,7 +9,6 @@ import { ControlsBar } from "@/components/admin/programme/ControlsBar";
 import { MonthCard } from "@/components/admin/programme/MonthCard";
 import { CompactList } from "@/components/admin/programme/CompactList";
 import { RiskModeView, RiskItem } from "@/components/admin/programme/RiskModeView";
-import { getActiveTripForCircuit, getTasksForTrip } from "@/lib/admin/store/trips-store";
 import { exportProgrammeAsPdf, exportProgrammeAsPng } from "@/lib/admin/programme-export";
 import { Circuit, CircuitCategory } from "@/lib/admin/types";
 import {
@@ -24,9 +23,21 @@ import {
   isAtRisk,
 } from "@/lib/admin/programme-annuel";
 
-export function ProgrammeAnnuelClient({ circuits }: { circuits: Circuit[] }) {
+export interface ActiveTripInfo {
+  id: string;
+  circuitId: string;
+  hasIncompleteChecklist: boolean;
+  tasks: { category: string; status: string; dueDate: string }[];
+}
+
+export function ProgrammeAnnuelClient({ circuits, activeTrips }: { circuits: Circuit[]; activeTrips: ActiveTripInfo[] }) {
   const now = React.useMemo(() => new Date(), []);
   const year = now.getFullYear();
+
+  const activeTripByCircuit = React.useMemo(
+    () => new Map(activeTrips.map((t) => [t.circuitId, t])),
+    [activeTrips]
+  );
 
   const [granularity, setGranularity] = React.useState<Granularity>("ANNEE");
   const [selectedWindow, setSelectedWindow] = React.useState(0);
@@ -74,24 +85,22 @@ export function ProgrammeAnnuelClient({ circuits }: { circuits: Circuit[] }) {
       const reasons: string[] = [];
       if (isAtRisk(departure, now)) reasons.push("Remplissage faible");
 
-      const trip = getActiveTripForCircuit(departure.circuit.id);
+      const trip = activeTripByCircuit.get(departure.circuit.id);
       if (trip) {
-        const tasks = getTasksForTrip(trip.id);
-        const overdue = tasks.some(
+        const overdue = trip.tasks.some(
           (t) => (t.category === "FINANCE" || t.category === "DOCUMENTS_CLIENT") && t.status !== "FAIT" && new Date(t.dueDate) < now
         );
         if (overdue) reasons.push("Tâche en retard");
 
         const daysUntil = getDaysUntil(departure.date, now);
-        const missingDocs =
-          daysUntil >= 0 && daysUntil <= 30 && trip.participants.some((p) => p.checklist.some((c) => !c.done));
+        const missingDocs = daysUntil >= 0 && daysUntil <= 30 && trip.hasIncompleteChecklist;
         if (missingDocs) reasons.push("Documents manquants");
       }
 
       if (reasons.length > 0) items.push({ departure, reasons });
     }
     return items;
-  }, [filteredDepartures, now, year]);
+  }, [filteredDepartures, now, year, activeTripByCircuit]);
 
   const recommendations = React.useMemo(() => getSalesOpeningRecommendations(allDepartures, now), [allDepartures, now]);
 
@@ -183,7 +192,14 @@ export function ProgrammeAnnuelClient({ circuits }: { circuits: Circuit[] }) {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {windowMonths.map((m) => (
-                <MonthCard key={m} month={m} year={year} departures={buckets.get(m) ?? []} now={now} />
+                <MonthCard
+                  key={m}
+                  month={m}
+                  year={year}
+                  departures={buckets.get(m) ?? []}
+                  now={now}
+                  activeTripByCircuit={activeTripByCircuit}
+                />
               ))}
             </div>
           )}

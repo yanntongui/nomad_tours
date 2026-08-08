@@ -6,16 +6,23 @@ import { CircuitStatsTab } from "@/components/admin/CircuitStatsTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCircuit, listCircuits } from "@/lib/server/circuits";
 import { listDestinations } from "@/lib/server/destinations";
+import { listTripFeedbacksForCircuit } from "@/lib/server/trips";
+import { listBookingsForCircuit } from "@/lib/server/bookings";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function EditCircuitPage({ params }: { params: { id: string } }) {
   const supabase = await createClient();
-  const [circuit, destinations, allCircuits, guidesResult] = await Promise.all([
+  const [circuit, destinations, allCircuits, guidesResult, feedbacks, circuitBookings] = await Promise.all([
     getCircuit(params.id),
     listDestinations(),
     listCircuits(),
     supabase.from("admin_profiles").select("id, name").eq("role", "GUIDE").order("name"),
+    listTripFeedbacksForCircuit(params.id),
+    listBookingsForCircuit(params.id),
   ]);
+
+  const avgRating =
+    feedbacks.length > 0 ? feedbacks.reduce((sum, f) => sum + f.rating, 0) / feedbacks.length : null;
 
   if (!circuit) {
     return (
@@ -44,7 +51,7 @@ export default async function EditCircuitPage({ params }: { params: { id: string
         />
       </TabsContent>
       <TabsContent value="stats">
-        <CircuitStatsTab circuit={circuit} />
+        <CircuitStatsTab circuit={circuit} avgRating={avgRating} bookings={circuitBookings} />
       </TabsContent>
     </Tabs>
   );

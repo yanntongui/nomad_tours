@@ -3,6 +3,9 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getClient } from "@/lib/server/clients";
 import { listActiveLoyaltyOffers } from "@/lib/server/loyalty";
+import { listTripFeedbacksForClient } from "@/lib/server/trips";
+import { listBookingsForClient } from "@/lib/server/bookings";
+import { listSupportTicketsForClient } from "@/lib/server/support";
 import { ClientDetailClient } from "./ClientDetailClient";
 
 export default async function ClientDetailPage({ params }: { params: { id: string } }) {
@@ -19,7 +22,21 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
     );
   }
 
-  const loyaltyOffers = await listActiveLoyaltyOffers();
+  const [loyaltyOffers, feedbacks, bookings, tickets] = await Promise.all([
+    listActiveLoyaltyOffers(),
+    listTripFeedbacksForClient(client.id),
+    listBookingsForClient(client.id),
+    listSupportTicketsForClient(client.id),
+  ]);
 
-  return <ClientDetailClient client={client} loyaltyOffers={loyaltyOffers} key={client.id} />;
+  return (
+    <ClientDetailClient
+      client={client}
+      loyaltyOffers={loyaltyOffers}
+      feedbacks={feedbacks}
+      bookings={bookings}
+      tickets={tickets}
+      key={client.id}
+    />
+  );
 }
