@@ -45,7 +45,7 @@ export function NotificationsBell({
               <span className="text-xs">
                 <span className="font-semibold text-stone-800 dark:text-stone-100">{atRiskCount} départ(s) à risque</span>
                 <br />
-                <span className="text-stone-400">Remplissage faible à l'approche du départ</span>
+                <span className="text-stone-400">Remplissage faible à l&apos;approche du départ</span>
               </span>
             </DropdownMenuItem>
           )}

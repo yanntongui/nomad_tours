@@ -99,7 +99,7 @@ export default function ContactPage() {
         {/* Right Column: Contact Form */}
         <div className="lg:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm space-y-6">
           <h2 className="text-2xl font-black text-nomad-navy border-b border-stone-100 pb-3">
-            Envoyer un Message à l'Équipe
+            Envoyer un Message à l&apos;Équipe
           </h2>
 
           {submitted ? (
@@ -107,7 +107,7 @@ export default function ContactPage() {
               <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
               <h3 className="text-xl font-bold">Message Reçu !</h3>
               <p className="text-xs text-emerald-700 max-w-md mx-auto">
-                Merci <strong>{name}</strong>. Notre équipe a bien enregistré votre message et vous répondra à l'adresse <strong>{email}</strong> sous quelques heures.
+                Merci <strong>{name}</strong>. Notre équipe a bien enregistré votre message et vous répondra à l&apos;adresse <strong>{email}</strong> sous quelques heures.
               </p>
               <button
                 onClick={() => setSubmitted(false)}
@@ -156,7 +156,7 @@ export default function ContactPage() {
                   onChange={(e) => setSubject(e.target.value)}
                   className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs text-stone-800 outline-none"
                 >
-                  <option value="Demande d'information">Demande d'information générale</option>
+                  <option value="Demande d'information">Demande d&apos;information générale</option>
                   <option value="Circuit sur-mesure">Circuit touristique sur-mesure</option>
                   <option value="Billetterie vol">Billetterie & Réservation vol</option>
                   <option value="Visa">Assistance Visa</option>

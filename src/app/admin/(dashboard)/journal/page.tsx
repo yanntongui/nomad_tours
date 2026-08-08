@@ -95,7 +95,7 @@ function JournalContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-stone-800 dark:text-stone-100">Journal d'audit</h1>
+          <h1 className="font-serif text-2xl font-semibold text-stone-800 dark:text-stone-100">Journal d&apos;audit</h1>
           <p className="text-sm text-stone-500 dark:text-stone-400">{filtered.length} événement{filtered.length > 1 ? "s" : ""} sur {entries.length}</p>
         </div>
         <Button

@@ -98,7 +98,7 @@ export default function CircuitsPage() {
           <div className="col-span-full bg-white rounded-2xl p-12 text-center text-stone-500 space-y-3 border border-stone-200">
             <Compass className="w-10 h-10 text-stone-300 mx-auto" />
             <h3 className="text-lg font-bold text-nomad-navy">Aucun circuit correspondant</h3>
-            <p className="text-xs">Modifiez vos critères pour afficher d'autres offres.</p>
+            <p className="text-xs">Modifiez vos critères pour afficher d&apos;autres offres.</p>
           </div>
         )}
       </div>

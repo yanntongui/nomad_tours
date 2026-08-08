@@ -183,7 +183,7 @@ export function DestinationForm({ initial, mode, circuits = [] }: DestinationFor
         <TabsList>
           <TabsTrigger value="general">Informations générales</TabsTrigger>
           <TabsTrigger value="media">Médias</TabsTrigger>
-          <TabsTrigger value="poi">Points d'intérêt</TabsTrigger>
+          <TabsTrigger value="poi">Points d&apos;intérêt</TabsTrigger>
           <TabsTrigger value="seo">SEO</TabsTrigger>
           {mode === "edit" && <TabsTrigger value="circuits">Circuits associés</TabsTrigger>}
         </TabsList>
@@ -256,7 +256,7 @@ export function DestinationForm({ initial, mode, circuits = [] }: DestinationFor
 
         <TabsContent value="poi">
           <Card>
-            <CardHeader><CardTitle className="text-sm">Points d'intérêt</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-sm">Points d&apos;intérêt</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 {pois.map((poi) => (
@@ -279,7 +279,7 @@ export function DestinationForm({ initial, mode, circuits = [] }: DestinationFor
                     </Button>
                   </div>
                 ))}
-                {pois.length === 0 && <p className="text-sm text-stone-400 dark:text-stone-500">Aucun point d'intérêt.</p>}
+                {pois.length === 0 && <p className="text-sm text-stone-400 dark:text-stone-500">Aucun point d&apos;intérêt.</p>}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 border-t border-stone-100 dark:border-stone-800 pt-4">
                 <div className="space-y-1.5">

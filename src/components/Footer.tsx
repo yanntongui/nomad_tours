@@ -43,7 +43,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/destinations/ganvie-venise-afrique" className="hover:text-nomad-terracotta transition-colors">
-                  Ganvié (Venise d'Afrique)
+                  Ganvié (Venise d&apos;Afrique)
                 </Link>
               </li>
               <li>
@@ -58,7 +58,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/destinations/abomey-palais-royaux" className="hover:text-nomad-terracotta transition-colors">
-                  Palais Royaux d'Abomey
+                  Palais Royaux d&apos;Abomey
                 </Link>
               </li>
               <li>
@@ -78,7 +78,7 @@ export default function Footer() {
               <li className="text-stone-300">Circuits Touristiques Sur-Mesure</li>
               <li className="text-stone-300">Billetterie & Réservation de Vols</li>
               <li className="text-stone-300">Assistance e-Visa Bénin & International</li>
-              <li className="text-stone-300">Événementiel & Séminaires d'Entreprise</li>
+              <li className="text-stone-300">Événementiel & Séminaires d&apos;Entreprise</li>
               <li className="text-stone-300">Accompagnement & Guides Professionnels</li>
             </ul>
           </div>

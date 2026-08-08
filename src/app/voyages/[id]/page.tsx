@@ -78,7 +78,7 @@ export default function TripLifecyclePage() {
         </div>
         <h1 className="text-3xl sm:text-4xl font-black">Accompagnement & Suivi de Voyage</h1>
         <p className="text-xs sm:text-sm text-stone-300">
-          Bienvenue dans votre espace voyage interactif. Suivez vos démarches avant le départ, l'actualité sur place et votre retour.
+          Bienvenue dans votre espace voyage interactif. Suivez vos démarches avant le départ, l&apos;actualité sur place et votre retour.
         </p>
       </div>
 
@@ -198,7 +198,7 @@ export default function TripLifecyclePage() {
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm space-y-6">
               <div className="border-b border-stone-100 pb-3">
-                <span className="text-xs font-bold text-emerald-700 uppercase">Fil d'Actualité en Direct</span>
+                <span className="text-xs font-bold text-emerald-700 uppercase">Fil d&apos;Actualité en Direct</span>
                 <h2 className="text-2xl font-black text-nomad-navy">Mises à Jour du Guide & du Groupe</h2>
               </div>
 
@@ -236,13 +236,13 @@ export default function TripLifecyclePage() {
               <AlertCircle className="w-10 h-10 text-rose-300 mx-auto" />
               <h3 className="text-lg font-black">Assistance & Urgence 24h/24</h3>
               <p className="text-xs text-rose-200">
-                Un problème durant le circuit ? Contactez immédiatement l'agence ou le responsable local.
+                Un problème durant le circuit ? Contactez immédiatement l&apos;agence ou le responsable local.
               </p>
               <a
                 href="tel:+2290197000000"
                 className="block bg-white text-rose-900 font-extrabold py-3 rounded-xl text-xs shadow transition"
               >
-                Appeler l'Urgence Nomad (+229)
+                Appeler l&apos;Urgence Nomad (+229)
               </a>
             </div>
           </div>
@@ -257,13 +257,13 @@ export default function TripLifecyclePage() {
           </div>
           <h2 className="text-2xl font-black text-nomad-navy">Questionnaire de Satisfaction Post-Voyage</h2>
           <p className="text-xs text-stone-600">
-            Merci d'avoir voyagé avec Nomad Tours ! Votre avis compte énormément pour continuer d'améliorer nos prestations au Bénin.
+            Merci d&apos;avoir voyagé avec Nomad Tours ! Votre avis compte énormément pour continuer d&apos;améliorer nos prestations au Bénin.
           </p>
 
           {feedbackSubmitted ? (
             <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl p-5">
               <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-              <h4 className="font-bold text-sm">Merci pour votre retour d'expérience !</h4>
+              <h4 className="font-bold text-sm">Merci pour votre retour d&apos;expérience !</h4>
               <p className="text-xs text-emerald-700 mt-1">
                 <strong>+50 points de fidélité</strong> ont été automatiquement crédités sur votre compte Nomad.
               </p>

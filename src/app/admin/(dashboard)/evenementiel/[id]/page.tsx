@@ -101,7 +101,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
             <Ban className="h-5 w-5 text-red-500" />
             <div>
               <p className="text-sm font-semibold text-stone-800 dark:text-stone-100">Cet événement a été annulé.</p>
-              <p className="text-xs text-stone-500 mt-0.5 dark:text-stone-400">Consultez l'historique pour le motif de l'annulation.</p>
+              <p className="text-xs text-stone-500 mt-0.5 dark:text-stone-400">Consultez l&apos;historique pour le motif de l&apos;annulation.</p>
             </div>
           </CardContent>
         </Card>
@@ -186,7 +186,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
         <TabsContent value="historique">
           <Card>
-            <CardHeader><CardTitle className="text-sm">Historique de l'événement</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-sm">Historique de l&apos;événement</CardTitle></CardHeader>
             <CardContent>
               <Timeline items={timelineItems} />
             </CardContent>

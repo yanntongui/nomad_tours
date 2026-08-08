@@ -179,7 +179,7 @@ export default function CircuitDetailPage({ params }: CircuitDetailPageProps) {
 
             <div className="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm space-y-3">
               <h3 className="text-base font-bold text-rose-700 flex items-center gap-2 border-b border-stone-100 pb-3">
-                <XCircle className="w-5 h-5" /> Ce qui n'est pas Inclus
+                <XCircle className="w-5 h-5" /> Ce qui n&apos;est pas Inclus
               </h3>
               <ul className="space-y-2 text-xs text-stone-700">
                 {circuit.excluded.map((item, idx) => (

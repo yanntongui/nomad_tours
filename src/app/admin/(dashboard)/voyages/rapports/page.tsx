@@ -162,7 +162,7 @@ function RapportsContent() {
             <FileBarChart2 className="h-7 w-7" />
           </span>
           <h2 className="text-lg font-semibold text-stone-800 dark:text-stone-100">Aucun rapport</h2>
-          <p className="mt-2 max-w-md text-sm text-stone-500 dark:text-stone-400">Les rapports de voyage apparaissent ici dès qu'un voyage est clôturé.</p>
+          <p className="mt-2 max-w-md text-sm text-stone-500 dark:text-stone-400">Les rapports de voyage apparaissent ici dès qu&apos;un voyage est clôturé.</p>
         </div>
       ) : (
         <DataTable

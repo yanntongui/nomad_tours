@@ -112,7 +112,7 @@ export function ControlsBar({
 
         <Button variant="outline" size="sm" onClick={onGoToToday}>
           <CalendarDays className="h-3.5 w-3.5" />
-          Aller à aujourd'hui
+          Aller à aujourd&apos;hui
         </Button>
       </div>
 

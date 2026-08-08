@@ -20,7 +20,7 @@ export function RequireRole({
         </span>
         <h2 className="text-lg font-semibold text-stone-800 dark:text-stone-100">Accès réservé</h2>
         <p className="mt-2 max-w-md text-sm text-stone-500 dark:text-stone-400">
-          Cette section n'est pas accessible avec votre rôle actuel. Changez de rôle depuis la barre supérieure pour y accéder.
+          Cette section n&apos;est pas accessible avec votre rôle actuel. Changez de rôle depuis la barre supérieure pour y accéder.
         </p>
       </div>
     );

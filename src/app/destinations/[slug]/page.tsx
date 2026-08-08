@@ -39,7 +39,7 @@ export default function DestinationDetailPage({
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center space-y-4">
         <h2 className="text-2xl font-bold text-nomad-navy">Destination introuvable</h2>
-        <p className="text-sm text-stone-600">La destination demandée n'existe pas ou a été déplacée.</p>
+        <p className="text-sm text-stone-600">La destination demandée n&apos;existe pas ou a été déplacée.</p>
         <Link href="/destinations" className="inline-block bg-nomad-terracotta text-white font-bold px-6 py-2.5 rounded-xl">
           Retour aux destinations
         </Link>
@@ -227,7 +227,7 @@ export default function DestinationDetailPage({
 
             <div className="bg-stone-50 rounded-2xl p-4 border border-stone-200 space-y-2 text-xs text-stone-600">
               <div className="flex items-center gap-2 text-nomad-navy font-bold">
-                <PhoneCall className="w-4 h-4 text-nomad-gold" /> Besoin d'une assistance immédiate ?
+                <PhoneCall className="w-4 h-4 text-nomad-gold" /> Besoin d&apos;une assistance immédiate ?
               </div>
               <p>Contactez nos conseillers voyage à Cotonou par WhatsApp :</p>
               <p className="font-mono text-xs font-bold text-nomad-navy">+229 01 97 00 00 00</p>

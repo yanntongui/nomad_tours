@@ -53,7 +53,7 @@ export default function FlightBookingPage() {
         <span className="bg-nomad-terracotta text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full">
           Billetterie & Vols Internationaux
         </span>
-        <h1 className="text-3xl sm:text-4xl font-black">Réservez vos Billets d'Avion avec Nomad Tours</h1>
+        <h1 className="text-3xl sm:text-4xl font-black">Réservez vos Billets d&apos;Avion avec Nomad Tours</h1>
         <p className="text-xs sm:text-sm text-stone-300">
           Comparez les tarifs des meilleures compagnies (Air France, Corsair, Brussels Airlines, Royal Air Maroc, Ethiopian).
         </p>
@@ -80,7 +80,7 @@ export default function FlightBookingPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-stone-700">Ville d'arrivée</label>
+            <label className="text-xs font-bold text-stone-700">Ville d&apos;arrivée</label>
             <input
               type="text"
               value={destination}
@@ -256,7 +256,7 @@ export default function FlightBookingPage() {
             onClick={() => setStep("confirmed")}
             className="w-full bg-nomad-navy text-white font-bold py-3.5 rounded-xl shadow transition"
           >
-            Confirmer l'Option de Billet
+            Confirmer l&apos;Option de Billet
           </button>
         </div>
       )}
@@ -269,7 +269,7 @@ export default function FlightBookingPage() {
           </div>
           <h2 className="text-2xl font-black text-nomad-navy">Réservation Enregistrée !</h2>
           <p className="text-xs text-stone-600">
-            Votre option de billet d'avion a été transmise à notre pôle Billetterie à Cotonou. Un conseiller vous contactera par WhatsApp pour finaliser l'émission du billet PNR.
+            Votre option de billet d&apos;avion a été transmise à notre pôle Billetterie à Cotonou. Un conseiller vous contactera par WhatsApp pour finaliser l&apos;émission du billet PNR.
           </p>
           <button
             onClick={() => setStep("search")}

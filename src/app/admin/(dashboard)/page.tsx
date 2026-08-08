@@ -249,7 +249,7 @@ function EventQuickCreateDialog({ open, onOpenChange }: { open: boolean; onOpenC
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Type d'événement</Label>
+              <Label>Type d&apos;événement</Label>
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -260,7 +260,7 @@ function EventQuickCreateDialog({ open, onOpenChange }: { open: boolean; onOpenC
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Nombre d'invités</Label>
+              <Label>Nombre d&apos;invités</Label>
               <Input type="number" min={1} value={guestCount} onChange={(e) => setGuestCount(Number(e.target.value))} />
             </div>
           </div>
@@ -270,7 +270,7 @@ function EventQuickCreateDialog({ open, onOpenChange }: { open: boolean; onOpenC
               <Input type="number" min={0} value={budgetXOF} onChange={(e) => setBudgetXOF(Number(e.target.value))} />
             </div>
             <div className="space-y-1.5">
-              <Label>Date de l'événement</Label>
+              <Label>Date de l&apos;événement</Label>
               <Input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
             </div>
           </div>
@@ -526,7 +526,7 @@ export default function AdminDashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-stone-800 dark:text-stone-100">Tableau de bord</h1>
-        <p className="text-sm text-stone-500 mt-0.5 dark:text-stone-400">Vue d'ensemble de l'activité Nomad Tours.</p>
+        <p className="text-sm text-stone-500 mt-0.5 dark:text-stone-400">Vue d&apos;ensemble de l&apos;activité Nomad Tours.</p>
       </div>
 
       <Card>
@@ -563,7 +563,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-sm">Chiffre d'affaires — 12 derniers mois</CardTitle>
+            <CardTitle className="text-sm">Chiffre d&apos;affaires — 12 derniers mois</CardTitle>
           </CardHeader>
           <CardContent className="h-72 pl-0">
             <ResponsiveContainer width="100%" height="100%">

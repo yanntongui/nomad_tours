@@ -30,7 +30,7 @@ export function ProgrammeHeader({
       <div>
         <h1 className="font-serif text-2xl font-semibold text-stone-900 dark:text-stone-100">Programme annuel</h1>
         <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-          Vue d'ensemble des départs de circuits sur l'année, pour repérer les mois creux et préparer vos campagnes.
+          Vue d&apos;ensemble des départs de circuits sur l&apos;année, pour repérer les mois creux et préparer vos campagnes.
         </p>
       </div>
       <div className="flex items-center gap-2">

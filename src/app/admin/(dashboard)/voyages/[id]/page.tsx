@@ -555,7 +555,7 @@ function CommunicationsTab({ trip, actor }: { trip: Trip; actor: string }) {
     <div className="space-y-4">
       {queue.length > 0 && (
         <Card>
-          <CardHeader><CardTitle className="text-sm">File d'attente de validation</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-sm">File d&apos;attente de validation</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {queue.map((c) => (
               <div key={c.id} className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2 dark:border-amber-800 dark:bg-amber-900/20">
@@ -641,7 +641,7 @@ function ApresVoyageTab({ trip, actor, avgRating }: { trip: Trip; actor: string;
         <Card>
           <CardHeader><CardTitle className="text-sm">Avis clients</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            {trip.feedbacks.length === 0 && <p className="text-sm text-stone-400 py-4 text-center dark:text-stone-500">Pas encore d'avis — disponible une fois le voyage terminé.</p>}
+            {trip.feedbacks.length === 0 && <p className="text-sm text-stone-400 py-4 text-center dark:text-stone-500">Pas encore d&apos;avis — disponible une fois le voyage terminé.</p>}
             {trip.feedbacks.map((f) => (
               <div key={f.id} className="rounded-lg border border-stone-100 p-3 dark:border-stone-800">
                 <div className="flex items-center gap-1 mb-1">

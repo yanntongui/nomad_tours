@@ -71,7 +71,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
       {/* CTA Box */}
       <div className="bg-gradient-to-r from-nomad-navy to-nomad-navy-light text-white rounded-3xl p-8 text-center space-y-4 shadow-xl">
-        <h3 className="text-2xl font-black">Envie d'explorer le Bénin par vous-même ?</h3>
+        <h3 className="text-2xl font-black">Envie d&apos;explorer le Bénin par vous-même ?</h3>
         <p className="text-xs text-stone-300 max-w-md mx-auto">
           Nos conseillers locaux organisent votre itinéraire sur-mesure au meilleur tarif.
         </p>

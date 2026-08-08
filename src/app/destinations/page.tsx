@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { MapPin, Search, Filter, Compass, LayoutGrid, Map as MapIcon, Sparkles } from "lucide-react";
 import { DESTINATIONS } from "@/lib/data/destinations";
@@ -8,6 +8,14 @@ import InteractiveBeninMap from "@/components/InteractiveBeninMap";
 import { useQuoteModal } from "@/context/QuoteModalContext";
 
 export default function DestinationsPage() {
+  return (
+    <Suspense>
+      <DestinationsPageContent />
+    </Suspense>
+  );
+}
+
+function DestinationsPageContent() {
   const { openQuoteModal: onOpenQuoteModal } = useQuoteModal();
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
@@ -51,7 +59,7 @@ export default function DestinationsPage() {
           <span className="bg-nomad-terracotta text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full">
             Catalogue Général
           </span>
-          <h1 className="text-3xl sm:text-4xl font-black">Destinations d'Exception Bénin & International</h1>
+          <h1 className="text-3xl sm:text-4xl font-black">Destinations d&apos;Exception Bénin & International</h1>
           <p className="text-xs sm:text-sm text-stone-300">
             Explorez nos 8 joyaux du Bénin et nos extensions internationales. Filtrez selon vos envies de voyage.
           </p>
@@ -157,7 +165,7 @@ export default function DestinationsPage() {
             <div className="col-span-full bg-white rounded-2xl p-12 text-center text-stone-500 space-y-3 border border-stone-200">
               <Compass className="w-10 h-10 text-stone-300 mx-auto" />
               <h3 className="text-lg font-bold text-nomad-navy">Aucune destination trouvée</h3>
-              <p className="text-xs">Essayez d'assouplir vos filtres de recherche.</p>
+              <p className="text-xs">Essayez d&apos;assouplir vos filtres de recherche.</p>
             </div>
           )}
         </div>

@@ -41,9 +41,9 @@ export default function EventsPage() {
         <span className="bg-white/20 text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full backdrop-blur-sm">
           Pôle Événementiel & MICE Bénin
         </span>
-        <h1 className="text-3xl sm:text-4xl font-black">Organisation d'Événements d'Exception</h1>
+        <h1 className="text-3xl sm:text-4xl font-black">Organisation d&apos;Événements d&apos;Exception</h1>
         <p className="text-xs sm:text-sm text-stone-200">
-          Séminaires d'entreprise, mariages d'exception, team-building en bord de mer et soirées privées.
+          Séminaires d&apos;entreprise, mariages d&apos;exception, team-building en bord de mer et soirées privées.
         </p>
       </div>
 
@@ -66,7 +66,7 @@ export default function EventsPage() {
             </div>
             <h3 className="text-2xl font-black text-nomad-navy">Devis Événementiel Généré !</h3>
             <p className="text-xs text-stone-600 max-w-md mx-auto">
-              Merci <strong>{fullName}</strong>. Votre devis estimatif d'un montant d'environ <strong>{estimatedQuoteXOF.toLocaleString("fr-FR")} FCFA</strong> a été envoyé à l'équipe Nomad Events.
+              Merci <strong>{fullName}</strong>. Votre devis estimatif d&apos;un montant d&apos;environ <strong>{estimatedQuoteXOF.toLocaleString("fr-FR")} FCFA</strong> a été envoyé à l&apos;équipe Nomad Events.
             </p>
             <button
               onClick={() => {
@@ -84,7 +84,7 @@ export default function EventsPage() {
             {step === 1 && (
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-stone-700">Type d'Événement</label>
+                  <label className="text-xs font-bold text-stone-700">Type d&apos;Événement</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
                       "Séminaire / Team Building",
@@ -111,7 +111,7 @@ export default function EventsPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-stone-700">Nombre d'Invités Estimé</label>
+                    <label className="text-xs font-bold text-stone-700">Nombre d&apos;Invités Estimé</label>
                     <input
                       type="number"
                       min={5}
@@ -241,7 +241,7 @@ export default function EventsPage() {
                   type="submit"
                   className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3.5 rounded-xl shadow transition flex items-center justify-center gap-2"
                 >
-                  <Send className="w-4 h-4" /> Transmettre ma demande d'événement
+                  <Send className="w-4 h-4" /> Transmettre ma demande d&apos;événement
                 </button>
               </form>
             )}

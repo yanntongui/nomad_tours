@@ -55,7 +55,7 @@ export default function VisasPage() {
         </span>
         <h1 className="text-3xl sm:text-4xl font-black">Assistance e-Visa & Visas Internationaux</h1>
         <p className="text-xs sm:text-sm text-stone-100">
-          Nomad Tours s'occupe de la vérification de vos pièces, de la saisie des formulaires officiels et du suivi de statut auprès des ambassades.
+          Nomad Tours s&apos;occupe de la vérification de vos pièces, de la saisie des formulaires officiels et du suivi de statut auprès des ambassades.
         </p>
       </div>
 
@@ -117,7 +117,7 @@ export default function VisasPage() {
               <div>
                 <strong>Délai estimé de traitement :</strong> {currentCountryInfo.processingTime}.
                 <p className="text-[11px] text-amber-700 mt-0.5">
-                  Notifications automatiques envoyées par WhatsApp & Email à chaque changement d'étape.
+                  Notifications automatiques envoyées par WhatsApp & Email à chaque changement d&apos;étape.
                 </p>
               </div>
             </div>

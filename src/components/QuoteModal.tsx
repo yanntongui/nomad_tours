@@ -112,7 +112,7 @@ export default function QuoteModal({
                 onChange={(e) => setCircuitId(e.target.value)}
                 className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-sm text-stone-800 focus:ring-2 focus:ring-nomad-terracotta outline-none"
               >
-                <option value="">Création d'itinéraire sur-mesure</option>
+                <option value="">Création d&apos;itinéraire sur-mesure</option>
                 {CIRCUITS.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.title} ({c.durationDays} Jours)
