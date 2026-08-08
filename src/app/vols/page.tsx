@@ -59,6 +59,33 @@ export default function FlightBookingPage() {
         </p>
       </div>
 
+      {/* Partner Airlines */}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-stone-200 shadow-sm">
+        <span className="text-[11px] font-bold uppercase tracking-wide text-stone-500 block mb-3">
+          Nos compagnies partenaires
+        </span>
+        <div className="flex flex-wrap gap-2">
+          {[
+            "Air France",
+            "Brussels Airlines",
+            "Air Côte d'Ivoire",
+            "Corsair",
+            "Ethiopian Airlines",
+            "RwandAir",
+            "Royal Air Maroc",
+            "ASKY",
+            "Air Burkina",
+          ].map((airline) => (
+            <span
+              key={airline}
+              className="bg-stone-50 border border-stone-200 text-stone-700 text-[11px] font-semibold px-3 py-1.5 rounded-full"
+            >
+              {airline}
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* Flight Search Form */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-md space-y-6">
         <form

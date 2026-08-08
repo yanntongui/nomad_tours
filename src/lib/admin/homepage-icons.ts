@@ -1,4 +1,4 @@
-import { Compass, Plane, FileCheck, PartyPopper, Headphones, Wallet, LucideIcon } from "lucide-react";
+import { Compass, Plane, FileCheck, PartyPopper, Headphones, Wallet, Car, Home, LucideIcon } from "lucide-react";
 import { HomepageIconKey } from "@/lib/admin/types";
 
 export const HOMEPAGE_ICON_MAP: Record<HomepageIconKey, LucideIcon> = {
@@ -8,6 +8,8 @@ export const HOMEPAGE_ICON_MAP: Record<HomepageIconKey, LucideIcon> = {
   PARTY_POPPER: PartyPopper,
   HEADPHONES: Headphones,
   WALLET: Wallet,
+  CAR: Car,
+  HOME: Home,
 };
 
 export const HOMEPAGE_ICON_OPTIONS: { key: HomepageIconKey; label: string }[] = [
@@ -17,4 +19,6 @@ export const HOMEPAGE_ICON_OPTIONS: { key: HomepageIconKey; label: string }[] = 
   { key: "PARTY_POPPER", label: "Fête" },
   { key: "HEADPHONES", label: "Casque / support" },
   { key: "WALLET", label: "Portefeuille" },
+  { key: "CAR", label: "Voiture" },
+  { key: "HOME", label: "Maison" },
 ];

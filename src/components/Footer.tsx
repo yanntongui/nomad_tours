@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Phone, Mail, Globe, ShieldCheck, Heart } from "lucide-react";
+import { MapPin, Phone, Mail, ShieldCheck, Heart, Facebook, Instagram } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -80,6 +80,16 @@ export default function Footer() {
               <li className="text-stone-300">Assistance e-Visa Bénin & International</li>
               <li className="text-stone-300">Événementiel & Séminaires d&apos;Entreprise</li>
               <li className="text-stone-300">Accompagnement & Guides Professionnels</li>
+              <li>
+                <Link href="/nomad-car" className="hover:text-nomad-terracotta transition-colors">
+                  Nomad Car — Location de Véhicules
+                </Link>
+              </li>
+              <li>
+                <Link href="/nomad-house" className="hover:text-nomad-terracotta transition-colors">
+                  Nomad House — Hébergement
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -95,11 +105,31 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-nomad-terracotta shrink-0" />
-                <span>+229 01 97 00 00 00 / +229 95 00 00 00</span>
+                <span>+229 01 97 24 70 24 / +229 94 80 07 06</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-nomad-terracotta shrink-0" />
-                <span>contact@nomadtours.bj</span>
+                <span>nomadtours229@gmail.com</span>
+              </div>
+              <div className="flex items-center gap-3 pt-1">
+                <a
+                  href="https://www.facebook.com/NomadToursAgency"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Facebook Nomad Tours"
+                  className="w-8 h-8 rounded-full bg-stone-800 border border-stone-700 flex items-center justify-center hover:bg-nomad-terracotta hover:border-nomad-terracotta transition-colors"
+                >
+                  <Facebook className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.instagram.com/NomadToursAgency"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Instagram Nomad Tours"
+                  className="w-8 h-8 rounded-full bg-stone-800 border border-stone-700 flex items-center justify-center hover:bg-nomad-terracotta hover:border-nomad-terracotta transition-colors"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
               </div>
               <div className="pt-2">
                 <span className="text-xs text-stone-400 block mb-1 font-semibold">Paiements acceptés :</span>

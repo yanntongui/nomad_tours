@@ -181,7 +181,7 @@ export default function ClientDashboardPage() {
               Une question sur votre voyage ? Votre agent dédié répond directement via WhatsApp ou message.
             </p>
             <a
-              href="https://wa.me/2290197000000"
+              href="https://wa.me/2290197247024"
               target="_blank"
               rel="noreferrer"
               className="block text-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition"

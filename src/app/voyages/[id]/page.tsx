@@ -239,7 +239,7 @@ export default function TripLifecyclePage() {
                 Un problème durant le circuit ? Contactez immédiatement l&apos;agence ou le responsable local.
               </p>
               <a
-                href="tel:+2290197000000"
+                href="tel:+2290197247024"
                 className="block bg-white text-rose-900 font-extrabold py-3 rounded-xl text-xs shadow transition"
               >
                 Appeler l&apos;Urgence Nomad (+229)

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Phone, Compass, Calendar, Menu, X, Plane, FileCheck, Send, User, LogIn } from "lucide-react";
+import { MapPin, Phone, Compass, Calendar, Menu, X, Plane, FileCheck, Send, User, LogIn, Car, Home } from "lucide-react";
 import { useQuoteModal } from "@/context/QuoteModalContext";
 
 export default function Header() {
@@ -21,7 +21,7 @@ export default function Header() {
             </span>
             <span className="hidden md:flex items-center gap-1.5">
               <Phone className="w-3.5 h-3.5 text-nomad-gold" />
-              +229 01 97 00 00 00 / WhatsApp
+              +229 01 97 24 70 24 / WhatsApp
             </span>
           </div>
           <div className="flex items-center gap-4 text-xs">
@@ -71,6 +71,14 @@ export default function Header() {
             <Link href="/visas" className="hover:text-nomad-terracotta transition-colors py-1 flex items-center gap-1">
               <FileCheck className="w-3.5 h-3.5 text-amber-600" />
               Visas
+            </Link>
+            <Link href="/nomad-car" className="hover:text-nomad-terracotta transition-colors py-1 flex items-center gap-1">
+              <Car className="w-3.5 h-3.5 text-nomad-terracotta" />
+              Nomad Car
+            </Link>
+            <Link href="/nomad-house" className="hover:text-nomad-terracotta transition-colors py-1 flex items-center gap-1">
+              <Home className="w-3.5 h-3.5 text-sky-600" />
+              Nomad House
             </Link>
             <Link href="/evenements" className="hover:text-nomad-terracotta transition-colors py-1">
               Événements
@@ -145,6 +153,20 @@ export default function Header() {
             className="block py-2 text-stone-800 font-medium hover:text-nomad-terracotta"
           >
             Assistance e-Visa
+          </Link>
+          <Link
+            href="/nomad-car"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block py-2 text-stone-800 font-medium hover:text-nomad-terracotta"
+          >
+            Nomad Car — Location de Véhicules
+          </Link>
+          <Link
+            href="/nomad-house"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block py-2 text-stone-800 font-medium hover:text-nomad-terracotta"
+          >
+            Nomad House — Hébergement
           </Link>
           <Link
             href="/evenements"

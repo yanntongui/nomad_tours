@@ -208,7 +208,7 @@ export function DestinationDetailClient({ destination, associatedCircuits }: Des
                 <PhoneCall className="w-4 h-4 text-nomad-gold" /> Besoin d&apos;une assistance immédiate ?
               </div>
               <p>Contactez nos conseillers voyage à Cotonou par WhatsApp :</p>
-              <p className="font-mono text-xs font-bold text-nomad-navy">+229 01 97 00 00 00</p>
+              <p className="font-mono text-xs font-bold text-nomad-navy">+229 01 97 24 70 24</p>
             </div>
           </div>
         </div>

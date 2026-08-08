@@ -58,7 +58,7 @@ export default function ContactPage() {
                 <Phone className="w-4 h-4 text-nomad-terracotta shrink-0" />
                 <div>
                   <span className="font-bold text-nomad-navy block">Téléphone & WhatsApp</span>
-                  <span>+229 01 97 00 00 00 / +229 95 00 00 00</span>
+                  <span>+229 01 97 24 70 24 / +229 94 80 07 06</span>
                 </div>
               </div>
 
@@ -66,7 +66,7 @@ export default function ContactPage() {
                 <Mail className="w-4 h-4 text-nomad-terracotta shrink-0" />
                 <div>
                   <span className="font-bold text-nomad-navy block">Email Général</span>
-                  <span>contact@nomadtours.bj</span>
+                  <span>nomadtours229@gmail.com</span>
                 </div>
               </div>
 
@@ -86,7 +86,7 @@ export default function ContactPage() {
             <h4 className="font-bold text-sm">Discuter sur WhatsApp</h4>
             <p className="text-xs text-emerald-200">Réponse immédiate de nos agents de garde à Cotonou.</p>
             <a
-              href="https://wa.me/2290197000000"
+              href="https://wa.me/2290197247024"
               target="_blank"
               rel="noreferrer"
               className="block bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs shadow transition"

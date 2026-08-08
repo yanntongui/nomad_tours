@@ -464,7 +464,7 @@ export interface CurrencyRate {
   rateToXOF: number;
 }
 
-export type HomepageIconKey = "COMPASS" | "PLANE" | "FILE_CHECK" | "PARTY_POPPER" | "HEADPHONES" | "WALLET";
+export type HomepageIconKey = "COMPASS" | "PLANE" | "FILE_CHECK" | "PARTY_POPPER" | "HEADPHONES" | "WALLET" | "CAR" | "HOME";
 
 export interface HomepageHero {
   eyebrow: string;
