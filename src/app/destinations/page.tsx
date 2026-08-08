@@ -5,12 +5,10 @@ import { MapPin, Search, Filter, Compass, LayoutGrid, Map as MapIcon, Sparkles }
 import { DESTINATIONS } from "@/lib/data/destinations";
 import DestinationCard from "@/components/DestinationCard";
 import InteractiveBeninMap from "@/components/InteractiveBeninMap";
+import { useQuoteModal } from "@/context/QuoteModalContext";
 
-interface DestinationsPageProps {
-  onOpenQuoteModal?: (destId?: string) => void;
-}
-
-export default function DestinationsPage({ onOpenQuoteModal }: DestinationsPageProps) {
+export default function DestinationsPage() {
+  const { openQuoteModal: onOpenQuoteModal } = useQuoteModal();
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
   const initialBudget = searchParams.get("budget") || "";

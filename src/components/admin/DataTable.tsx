@@ -2,6 +2,7 @@
 import * as React from "react";
 import {
   ColumnDef,
+  ColumnOrderState,
   RowSelectionState,
   SortingState,
   VisibilityState,
@@ -11,13 +12,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Columns, Download } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Columns, Download } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -55,6 +55,7 @@ interface DataTableProps<TData> {
   onExportCsv?: () => void;
   pageSize?: number;
   emptyMessage?: string;
+  storageKey?: string;
 }
 
 export function DataTable<TData>({
@@ -68,10 +69,12 @@ export function DataTable<TData>({
   onExportCsv,
   pageSize = 10,
   emptyMessage = "Aucun résultat.",
+  storageKey,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>([]);
 
   const finalColumns = React.useMemo<ColumnDef<TData, any>[]>(() => {
     if (!enableSelection) return columns;
@@ -92,14 +95,59 @@ export function DataTable<TData>({
     return [selectCol, ...columns];
   }, [columns, enableSelection]);
 
+  const defaultColumnOrder = React.useMemo(
+    () => finalColumns.map((c: any) => c.id ?? c.accessorKey as string),
+    [finalColumns]
+  );
+  const defaultColumnOrderKey = defaultColumnOrder.join("|");
+
+  React.useEffect(() => {
+    if (storageKey && typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem(`nomad-admin-columns-${storageKey}`);
+        if (raw) {
+          const stored = JSON.parse(raw) as string[];
+          const valid = stored.filter((id) => defaultColumnOrder.includes(id));
+          const missing = defaultColumnOrder.filter((id) => !valid.includes(id));
+          setColumnOrder([...valid, ...missing]);
+          return;
+        }
+      } catch {
+        // ignore malformed storage
+      }
+    }
+    setColumnOrder(defaultColumnOrder);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey, defaultColumnOrderKey]);
+
+  React.useEffect(() => {
+    if (storageKey && columnOrder.length > 0 && typeof window !== "undefined") {
+      window.localStorage.setItem(`nomad-admin-columns-${storageKey}`, JSON.stringify(columnOrder));
+    }
+  }, [storageKey, columnOrder]);
+
+  function moveColumn(id: string, direction: "up" | "down") {
+    setColumnOrder((prev) => {
+      const order = prev.length > 0 ? prev : defaultColumnOrder;
+      const idx = order.indexOf(id);
+      if (idx === -1) return prev;
+      const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+      if (swapIdx < 0 || swapIdx >= order.length) return order;
+      const next = [...order];
+      [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
+      return next;
+    });
+  }
+
   const table = useReactTable({
     data,
     columns: finalColumns,
-    state: { sorting, rowSelection, columnVisibility },
+    state: { sorting, rowSelection, columnVisibility, columnOrder },
     getRowId,
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
+    onColumnOrderChange: setColumnOrder,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -112,6 +160,10 @@ export function DataTable<TData>({
   }, [rowSelection]);
 
   const rows = table.getRowModel().rows;
+  const orderForMenu = columnOrder.length > 0 ? columnOrder : defaultColumnOrder;
+  const menuColumns = [...table.getAllColumns()]
+    .filter((c) => c.getCanHide())
+    .sort((a, b) => orderForMenu.indexOf(a.id) - orderForMenu.indexOf(b.id));
 
   return (
     <div className="space-y-3">
@@ -123,22 +175,42 @@ export function DataTable<TData>({
               Colonnes
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Afficher les colonnes</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="w-60">
+            <DropdownMenuLabel>Afficher / réordonner les colonnes</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {table
-              .getAllColumns()
-              .filter((c) => c.getCanHide())
-              .map((column) => (
-                <DropdownMenuCheckboxItem
+            <div className="max-h-72 overflow-y-auto px-1 py-1">
+              {menuColumns.map((column, idx) => (
+                <div
                   key={column.id}
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(v) => column.toggleVisibility(!!v)}
-                  onSelect={(e) => e.preventDefault()}
+                  className="flex items-center justify-between gap-1 rounded-sm px-1.5 py-1 text-sm hover:bg-stone-100 dark:hover:bg-stone-800"
                 >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
+                  <label className="flex min-w-0 flex-1 items-center gap-2 cursor-pointer">
+                    <Checkbox checked={column.getIsVisible()} onCheckedChange={(v) => column.toggleVisibility(!!v)} />
+                    <span className="truncate text-stone-700 dark:text-stone-300">{column.id}</span>
+                  </label>
+                  <div className="flex items-center gap-0.5">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      disabled={idx === 0}
+                      onClick={() => moveColumn(column.id, "up")}
+                    >
+                      <ChevronUp className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      disabled={idx === menuColumns.length - 1}
+                      onClick={() => moveColumn(column.id, "down")}
+                    >
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
               ))}
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
         {onExportCsv && (

@@ -4,13 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Clock, User, ChevronRight, ArrowLeft, Share2, Compass } from "lucide-react";
 import { BLOG_POSTS } from "@/lib/data/blog-posts";
+import { useQuoteModal } from "@/context/QuoteModalContext";
 
 interface BlogPostPageProps {
   params: { slug: string };
-  onOpenQuoteModal?: (destId?: string) => void;
 }
 
-export default function BlogPostPage({ params, onOpenQuoteModal }: BlogPostPageProps) {
+export default function BlogPostPage({ params }: BlogPostPageProps) {
+  const { openQuoteModal: onOpenQuoteModal } = useQuoteModal();
   const post = BLOG_POSTS.find((p) => p.slug === params.slug || p.id === params.slug);
 
   if (!post) {

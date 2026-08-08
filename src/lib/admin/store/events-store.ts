@@ -1,6 +1,7 @@
 "use client";
 import { useSyncExternalStore } from "react";
 import { EVENT_REQUESTS as INITIAL_REQUESTS, EVENT_TIMELINE as INITIAL_TIMELINE } from "@/lib/admin/mock/events";
+import { pushNotification } from "@/lib/admin/store/notifications-store";
 import { ClientRef, EventRequest, EventStatus, EventTimelineEntry } from "@/lib/admin/types";
 
 interface State {
@@ -113,6 +114,11 @@ export function createEventRequest(
   };
   state.requests = [request, ...state.requests];
   logTimeline(request.id, "Demande créée", `${input.type} — ${input.guestCount} invités`, actor);
+  pushNotification({
+    title: "Nouvelle demande événementielle",
+    description: `${input.client.name} — ${input.type}`,
+    href: `/admin/evenementiel/${request.id}`,
+  });
   emit();
   return request;
 }

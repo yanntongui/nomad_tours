@@ -126,4 +126,49 @@ export const HOMEPAGE_CONTENT: HomepageContent = {
     confirmMessage: "Merci ! Vous recevrez bientôt notre prochaine inspiration voyage.",
     disclaimer: "Pas de spam, juste de l'inspiration voyage.",
   },
+  sectionsOrder: [
+    { key: "hero", enabled: true, order: 0 },
+    { key: "trustBar", enabled: true, order: 1 },
+    { key: "services", enabled: true, order: 2 },
+    { key: "destinations", enabled: true, order: 3 },
+    { key: "whyUs", enabled: true, order: 4 },
+    { key: "featuredCircuit", enabled: true, order: 5 },
+    { key: "testimonials", enabled: true, order: 6 },
+    { key: "gallery", enabled: true, order: 7 },
+    { key: "newsletter", enabled: true, order: 8 },
+  ],
+  featuredDestinations: {
+    eyebrow: "Inspirations de voyage",
+    title: "Destinations vedettes",
+    destinationIds: ["dest-afrique-sud", "dest-grand-popo", "dest-ganvie"],
+  },
+  testimonialsConfig: {
+    eyebrow: "Ils nous ont fait confiance",
+    title: "Ce que nos voyageurs racontent",
+    testimonialIds: ["test-1", "test-2", "test-3"],
+  },
+  footer: {
+    description:
+      "Voyages sur-mesure au Bénin et à l'international. Une agence à taille humaine, une exigence sans compromis.",
+    address: "Cotonou, Bénin",
+    phone: "+229 01 97 00 00 00",
+    email: "contact@nomadtours.bj",
+    columns: [
+      {
+        id: "footer-col-services",
+        title: "Services",
+        links: [
+          { id: "footer-link-1", label: "Circuits sur-mesure", href: "/circuits" },
+          { id: "footer-link-2", label: "Billetterie aérienne", href: "/vols" },
+          { id: "footer-link-3", label: "Assistance e-Visa", href: "/visas" },
+          { id: "footer-link-4", label: "Événementiel & séminaires", href: "/evenements" },
+        ],
+      },
+    ],
+    socials: [
+      { id: "footer-social-1", platform: "Instagram", url: "#" },
+      { id: "footer-social-2", platform: "Facebook", url: "#" },
+      { id: "footer-social-3", platform: "Youtube", url: "#" },
+    ],
+  },
 };

@@ -5,6 +5,10 @@ import { BOOKINGS } from "@/lib/admin/mock/bookings";
 import { ADMIN_CIRCUITS } from "@/lib/admin/mock/circuits";
 import { TASK_TEMPLATES } from "@/lib/admin/mock/task-templates";
 import { COMMUNICATION_TEMPLATES } from "@/lib/admin/mock/communication-templates";
+import { TRIP_REPORTS as INITIAL_REPORTS } from "@/lib/admin/mock/trip-reports";
+import { getBookingPayments } from "@/lib/admin/store/bookings-store";
+import { getSupplier } from "@/lib/admin/store/suppliers-store";
+import { pushNotification } from "@/lib/admin/store/notifications-store";
 import {
   CommStatus,
   Trip,
@@ -18,6 +22,11 @@ import {
   TripFeedback,
   TaskStatus,
   TaskTemplate,
+  TripReport,
+  TripReportActionItem,
+  TripReportManualFields,
+  Supplier,
+  SupplierType,
 } from "@/lib/admin/types";
 
 const TODAY = new Date(2026, 7, 2);
@@ -29,6 +38,8 @@ interface State {
   checkins: TripCheckin[];
   tripTimeline: TripTimelineEntry[];
   photos: TripPhoto[];
+  reports: TripReport[];
+  reportActionItems: TripReportActionItem[];
 }
 
 let seq = 1;
@@ -42,6 +53,12 @@ function circuitThemeForTrip(trip: Trip) {
   if (!booking) return undefined;
   const circuit = ADMIN_CIRCUITS.find((c) => c.id === booking.referenceId);
   return circuit?.theme;
+}
+
+function circuitForTrip(trip: Trip) {
+  const booking = BOOKINGS.find((b) => b.id === trip.bookingId);
+  if (!booking) return undefined;
+  return ADMIN_CIRCUITS.find((c) => c.id === booking.referenceId);
 }
 
 function templateForTrip(trip: Trip): TaskTemplate | undefined {
@@ -78,7 +95,7 @@ function materializeTasksAndComms(trip: Trip, template: TaskTemplate): { tasks: 
       status,
       priority: item.priority,
       subItems: item.subItems.map((label, i) => ({ id: `${taskId}-sub-${i}`, label, done: status === "FAIT" })),
-      supplierTag: item.supplierTag,
+      supplierId: item.supplierId,
       attachments: [],
       communicationTemplateId: item.communicationTemplateId,
       communicationTrigger: item.communicationTrigger,
@@ -122,7 +139,16 @@ function buildInitialState(): State {
     tasks.push(...t);
     communications.push(...comms);
   });
-  return { trips, tasks, communications, checkins: [], tripTimeline: [], photos: [] };
+  return {
+    trips,
+    tasks,
+    communications,
+    checkins: [],
+    tripTimeline: [],
+    photos: [],
+    reports: [...INITIAL_REPORTS],
+    reportActionItems: [],
+  };
 }
 
 let state: State = buildInitialState();
@@ -161,6 +187,15 @@ export function useTrips() {
 
 export function getTrip(id: string) {
   return state.trips.find((t) => t.id === id);
+}
+
+export function getActiveTripForCircuit(circuitId: string): Trip | undefined {
+  const bookingIds = new Set(BOOKINGS.filter((b) => b.referenceId === circuitId).map((b) => b.id));
+  return state.trips.find((t) => t.status === "ONGOING" && bookingIds.has(t.bookingId));
+}
+
+export function getTasksForTrip(tripId: string): TripTask[] {
+  return state.tasks.filter((t) => t.tripId === tripId);
 }
 
 export function toggleChecklistItem(tripId: string, participantId: string, label: string) {
@@ -210,7 +245,10 @@ export function setTripStatus(tripId: string, status: TripStatus) {
     CANCELLED: "Voyage annulé",
   };
   logTimeline(tripId, labels[status], undefined, undefined);
-  if (status === "COMPLETED") maybeTriggerSatisfactionSurvey(tripId);
+  if (status === "COMPLETED") {
+    maybeTriggerSatisfactionSurvey(tripId);
+    maybeGenerateTripReport(tripId);
+  }
   emit();
 }
 
@@ -312,7 +350,7 @@ export function addTask(
     dueDate: string;
     assigneeName?: string;
     priority: TripTask["priority"];
-    supplierTag?: string;
+    supplierId?: string;
   },
   actor: string
 ) {
@@ -328,7 +366,7 @@ export function addTask(
     status: "A_FAIRE",
     priority: input.priority,
     subItems: [],
-    supplierTag: input.supplierTag,
+    supplierId: input.supplierId,
     attachments: [],
     createdAt: now,
     updatedAt: now,
@@ -476,5 +514,154 @@ export function updateTripPhotoCaption(photoId: string, caption: string) {
 
 export function removeTripPhoto(photoId: string) {
   state.photos = state.photos.filter((p) => p.id !== photoId);
+  emit();
+}
+
+// ---- Rapport de voyage ----
+
+export function getTripGeneralInfo(trip: Trip) {
+  return {
+    circuitName: trip.title,
+    startDate: trip.startDate,
+    endDate: trip.endDate,
+    participantCount: trip.participants.length,
+    guideName: trip.guideName,
+  };
+}
+
+export function getRegistrationStats(trip: Trip) {
+  const payments = getBookingPayments(trip.bookingId).filter((p) => p.status === "PAID");
+  return {
+    inscrits: trip.participants.length,
+    historiquePaiements: payments,
+    totalPaid: payments.reduce((sum, p) => sum + p.amountXOF, 0),
+  };
+}
+
+export function getPreDepartureTasksSummary(tripId: string) {
+  const tasks = state.tasks.filter((t) => t.tripId === tripId && t.phase === "AVANT");
+  const done = tasks.filter((t) => t.status === "FAIT").length;
+  return {
+    tasks,
+    total: tasks.length,
+    done,
+    completionRate: tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0,
+  };
+}
+
+export function getSupplierInvolvement(tripId: string, type: SupplierType): Supplier[] {
+  const supplierIds = new Set(
+    state.tasks.filter((t) => t.tripId === tripId && t.supplierId).map((t) => t.supplierId!)
+  );
+  return Array.from(supplierIds)
+    .map((id) => getSupplier(id))
+    .filter((s): s is Supplier => !!s && s.type === type);
+}
+
+export function getItineraryVsActual(trip: Trip) {
+  const circuit = circuitForTrip(trip);
+  return {
+    prevu: circuit?.itinerary ?? [],
+    reel: trip.updates,
+  };
+}
+
+export function getGuideEngagementStats(trip: Trip) {
+  return { guideName: trip.guideName, updatesCount: trip.updates.length };
+}
+
+export function getFeedbackAggregation(trip: Trip) {
+  const feedbacks = trip.feedbacks;
+  const avg = feedbacks.length > 0 ? feedbacks.reduce((sum, f) => sum + f.rating, 0) / feedbacks.length : 0;
+  const distribution = [1, 2, 3, 4, 5].map((star) => ({
+    star,
+    count: feedbacks.filter((f) => f.rating === star).length,
+  }));
+  return { feedbacks, avg, distribution };
+}
+
+export function getFinancialSummary(trip: Trip) {
+  const booking = BOOKINGS.find((b) => b.id === trip.bookingId);
+  const payments = getBookingPayments(trip.bookingId).filter((p) => p.status === "PAID");
+  const encaisse = payments.reduce((sum, p) => sum + p.amountXOF, 0);
+  const budgetPrevu = booking?.totalPriceXOF ?? 0;
+  return { budgetPrevu, encaisse, impaye: Math.max(budgetPrevu - encaisse, 0), payments };
+}
+
+export function useTripReport(tripId: string) {
+  const s = useTripsStore();
+  return s.reports.find((r) => r.tripId === tripId);
+}
+
+export function useTripReports() {
+  const s = useTripsStore();
+  return s.reports;
+}
+
+export function useReportActionItems(reportId: string) {
+  const s = useTripsStore();
+  return s.reportActionItems.filter((i) => i.reportId === reportId);
+}
+
+const REPORT_GENERATED_LABEL = "Rapport de voyage généré";
+
+function maybeGenerateTripReport(tripId: string) {
+  const already = state.reports.some((r) => r.tripId === tripId);
+  if (already) return;
+  const trip = state.trips.find((t) => t.id === tripId);
+  if (!trip) return;
+  const now = new Date().toISOString();
+  const report: TripReport = {
+    id: nextId("report"),
+    tripId,
+    status: "DRAFT",
+    manual: {},
+    generatedAt: now,
+    generatedBy: "Système",
+    updatedAt: now,
+  };
+  state.reports = [report, ...state.reports];
+  logTimeline(tripId, REPORT_GENERATED_LABEL, "Rapport de voyage brouillon généré automatiquement à la clôture", "Système");
+  pushNotification({
+    title: "Rapport de voyage à compléter",
+    description: trip.title,
+    href: `/admin/voyages/${tripId}/rapport`,
+  });
+}
+
+export function ensureTripReport(tripId: string) {
+  const already = state.reports.some((r) => r.tripId === tripId);
+  if (already) return;
+  maybeGenerateTripReport(tripId);
+  emit();
+}
+
+export function updateReportSection(tripId: string, patch: Partial<TripReportManualFields>) {
+  state.reports = state.reports.map((r) =>
+    r.tripId === tripId ? { ...r, manual: { ...r.manual, ...patch }, updatedAt: new Date().toISOString() } : r
+  );
+  emit();
+}
+
+export function finalizeReport(tripId: string, actor: string) {
+  const now = new Date().toISOString();
+  state.reports = state.reports.map((r) =>
+    r.tripId === tripId ? { ...r, status: "FINALIZED", finalizedAt: now, finalizedBy: actor, updatedAt: now } : r
+  );
+  logTimeline(tripId, "Rapport de voyage finalisé", undefined, actor);
+  emit();
+}
+
+export function addReportActionItems(reportId: string, labels: string[]) {
+  const now = new Date().toISOString();
+  const items: TripReportActionItem[] = labels
+    .filter((l) => l.trim())
+    .map((label) => ({ id: nextId("ractn"), reportId, label: label.trim(), done: false, createdAt: now }));
+  state.reportActionItems = [...items, ...state.reportActionItems];
+  emit();
+}
+
+export function toggleReportActionItem(id: string) {
+  state.reportActionItems = state.reportActionItems.map((i) => (i.id === id ? { ...i, done: !i.done } : i));
   emit();
 }

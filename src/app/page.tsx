@@ -32,9 +32,11 @@ import {
 } from "lucide-react";
 import { useQuoteModal } from "@/context/QuoteModalContext";
 import { useHomepageContent } from "@/lib/admin/store/homepage-store";
+import { useTestimonialsStore } from "@/lib/admin/store/testimonials-store";
 import { HOMEPAGE_ICON_MAP } from "@/lib/admin/homepage-icons";
 import GalleryModal from "@/components/GalleryModal";
 import { GALLERY_PHOTOS } from "@/lib/data/gallery";
+import { DESTINATIONS as PUBLIC_DESTINATIONS } from "@/lib/data/destinations";
 import {
   HomepageHero,
   HomepageStat,
@@ -42,6 +44,10 @@ import {
   HomepageWhyUsSection as HomepageWhyUsSectionType,
   HomepagePromoBanner,
   HomepageNewsletterBanner,
+  HomepageFeaturedDestinationsSection,
+  HomepageTestimonialsConfig,
+  HomepageFooterConfig,
+  AdminTestimonial,
 } from "@/lib/admin/types";
 
 /* ------------------------------------------------------------------ */
@@ -73,93 +79,6 @@ const NAV_LINKS = [
   { label: "Visa", href: "/visas" },
   { label: "Galerie", href: "/galerie" },
   { label: "À propos", href: "#pourquoi" },
-];
-
-const DESTINATIONS = [
-  {
-    id: "afrique-du-sud",
-    name: "Afrique du Sud",
-    tag: "Coup de cœur du moment",
-    price: "890 000 FCFA",
-    image:
-      "https://images.unsplash.com/photo-1547721064-da6cfb341d50?auto=format&fit=crop&w=1600&q=80",
-    large: true,
-  },
-  {
-    id: "grand-popo",
-    name: "Bénin — Grand-Popo",
-    tag: "Plage & farniente",
-    price: "45 000 FCFA",
-    image:
-      "https://images.unsplash.com/photo-1579493933703-70473cdf84f8?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "ganvie",
-    name: "Bénin — Ganvié",
-    tag: "Cité lacustre",
-    price: "35 000 FCFA",
-    image:
-      "https://images.unsplash.com/photo-1760637626892-7636eff73752?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "marrakech",
-    name: "Maroc — Marrakech",
-    tag: "Médina & désert",
-    price: "420 000 FCFA",
-    image:
-      "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "dubai",
-    name: "Émirats — Dubaï",
-    tag: "Modernité & luxe",
-    price: "650 000 FCFA",
-    image:
-      "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "paris",
-    name: "France — Paris",
-    tag: "Escapade citadine",
-    price: "580 000 FCFA",
-    image:
-      "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    name: "Aïcha M.",
-    trip: "Séjour Afrique du Sud, 10 jours",
-    quote:
-      "Un voyage pensé dans les moindres détails. Nomad Tours a su transformer notre rêve de safari en un souvenir inoubliable, sans aucun stress logistique.",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&h=200&q=80",
-  },
-  {
-    name: "Julien R.",
-    trip: "Circuit Pendjari & Nord Bénin",
-    quote:
-      "L'expertise locale a fait toute la différence. Des hébergements de charme, un guide passionné, et une immersion authentique loin des clichés touristiques.",
-    avatar:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&h=200&q=80",
-  },
-  {
-    name: "Fatou D.",
-    trip: "Escapade Marrakech, 5 jours",
-    quote:
-      "Réactivité, élégance et écoute. J'ai senti qu'on organisait mon voyage sur-mesure, pas un forfait générique. Je recommande sans hésiter.",
-    avatar:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&h=200&q=80",
-  },
-  {
-    name: "Marc-Antoine K.",
-    trip: "Séminaire d'entreprise, Cotonou",
-    quote:
-      "Nomad Tours a orchestré notre séminaire d'entreprise avec un vrai sens du détail. Une prestation événementielle au niveau international.",
-    avatar:
-      "https://images.unsplash.com/photo-1552058544-f2b08422138a?auto=format&fit=crop&w=200&h=200&q=80",
-  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -590,7 +509,13 @@ function ServicesSection({ content }: { content: HomepageServicesSectionType }) 
 /*  Destinations bento                                                 */
 /* ------------------------------------------------------------------ */
 
-function DestinationsSection() {
+function DestinationsSection({ content }: { content: HomepageFeaturedDestinationsSection }) {
+  const destinations = content.destinationIds
+    .map((id) => PUBLIC_DESTINATIONS.find((d) => d.id === id))
+    .filter((d): d is (typeof PUBLIC_DESTINATIONS)[number] => Boolean(d));
+
+  if (destinations.length === 0) return null;
+
   return (
     <section className="max-w-7xl mx-auto px-6 lg:px-10 py-24 sm:py-32">
       <motion.div
@@ -604,14 +529,14 @@ function DestinationsSection() {
           <motion.div variants={fadeUp} className="flex items-center gap-3 mb-4">
             <span className="w-8 h-px bg-luxe-gold" />
             <span className="text-xs tracking-[0.2em] uppercase text-luxe-terracotta font-semibold">
-              Inspirations de voyage
+              {content.eyebrow}
             </span>
           </motion.div>
           <motion.h2
             variants={fadeUp}
             className="font-serif text-3xl sm:text-5xl text-luxe-ink leading-tight"
           >
-            Destinations vedettes
+            {content.title}
           </motion.h2>
         </div>
         <motion.div variants={fadeUp}>
@@ -632,18 +557,18 @@ function DestinationsSection() {
         variants={staggerContainer}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2 gap-5"
       >
-        {DESTINATIONS.map((dest) => (
+        {destinations.map((dest, i) => (
           <motion.div
             key={dest.id}
             variants={fadeUp}
             className={`group relative overflow-hidden rounded-2xl ${
-              dest.large
+              i === 0
                 ? "sm:col-span-2 lg:col-span-2 lg:row-span-2 h-[340px] lg:h-full"
                 : "h-[260px]"
             }`}
           >
             <Image
-              src={dest.image}
+              src={dest.images[0]}
               alt={dest.name}
               fill
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
@@ -651,11 +576,11 @@ function DestinationsSection() {
             <div className="absolute inset-0 bg-gradient-to-t from-luxe-ink/85 via-luxe-ink/10 to-transparent transition-opacity duration-500" />
             <div className="absolute inset-0 p-6 flex flex-col justify-end">
               <span className="text-[10px] tracking-[0.2em] uppercase text-luxe-gold font-semibold mb-2">
-                {dest.tag}
+                {dest.region ?? dest.country}
               </span>
               <h3
                 className={`font-serif text-white leading-tight mb-3 ${
-                  dest.large ? "text-3xl sm:text-4xl" : "text-xl"
+                  i === 0 ? "text-3xl sm:text-4xl" : "text-xl"
                 }`}
               >
                 {dest.name}
@@ -664,7 +589,7 @@ function DestinationsSection() {
                 <span className="text-white/80 text-xs">
                   à partir de{" "}
                   <strong className="text-white font-semibold">
-                    {dest.price}
+                    {dest.startingPriceXOF.toLocaleString("fr-FR")} FCFA
                   </strong>
                 </span>
                 <span className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
@@ -868,13 +793,23 @@ function FeaturedCircuitSection({ content }: { content: HomepagePromoBanner }) {
 /*  Testimonials                                                       */
 /* ------------------------------------------------------------------ */
 
-function TestimonialsSection() {
+function TestimonialsSection({
+  content,
+  testimonials,
+}: {
+  content: HomepageTestimonialsConfig;
+  testimonials: AdminTestimonial[];
+}) {
   const [index, setIndex] = useState(0);
-  const t = TESTIMONIALS[index];
+  const ordered = content.testimonialIds
+    .map((id) => testimonials.find((t) => t.id === id))
+    .filter((t): t is AdminTestimonial => Boolean(t));
 
-  const next = () => setIndex((i) => (i + 1) % TESTIMONIALS.length);
-  const prev = () =>
-    setIndex((i) => (i - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+  if (ordered.length === 0) return null;
+  const t = ordered[Math.min(index, ordered.length - 1)];
+
+  const next = () => setIndex((i) => (i + 1) % ordered.length);
+  const prev = () => setIndex((i) => (i - 1 + ordered.length) % ordered.length);
 
   return (
     <section className="bg-luxe-emerald text-white py-24 sm:py-32">
@@ -888,7 +823,7 @@ function TestimonialsSection() {
           <motion.div variants={fadeUp} className="flex items-center justify-center gap-3 mb-4">
             <span className="w-8 h-px bg-luxe-gold" />
             <span className="text-xs tracking-[0.2em] uppercase text-luxe-gold font-semibold">
-              Ils nous ont fait confiance
+              {content.eyebrow}
             </span>
             <span className="w-8 h-px bg-luxe-gold" />
           </motion.div>
@@ -896,14 +831,14 @@ function TestimonialsSection() {
             variants={fadeUp}
             className="font-serif text-3xl sm:text-4xl mb-14"
           >
-            Ce que nos voyageurs racontent
+            {content.title}
           </motion.h2>
         </motion.div>
 
         <div className="relative">
           <AnimatePresence mode="wait">
             <motion.div
-              key={index}
+              key={t.id}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
@@ -911,15 +846,17 @@ function TestimonialsSection() {
             >
               <Quote className="w-8 h-8 text-luxe-gold/60 mx-auto mb-6" strokeWidth={1.2} />
               <p className="font-serif italic text-xl sm:text-2xl leading-relaxed text-white/95 max-w-2xl mx-auto mb-8">
-                &ldquo;{t.quote}&rdquo;
+                &ldquo;{t.content}&rdquo;
               </p>
               <div className="flex items-center justify-center gap-3">
-                <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-luxe-gold/50">
-                  <Image src={t.avatar} alt={t.name} fill className="object-cover" />
-                </div>
+                {t.userAvatar && (
+                  <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-luxe-gold/50">
+                    <Image src={t.userAvatar} alt={t.userName} fill className="object-cover" />
+                  </div>
+                )}
                 <div className="text-left">
-                  <p className="text-sm font-semibold">{t.name}</p>
-                  <p className="text-xs text-white/60">{t.trip}</p>
+                  <p className="text-sm font-semibold">{t.userName}</p>
+                  <p className="text-xs text-white/60">{t.tripTitle}</p>
                 </div>
               </div>
             </motion.div>
@@ -934,9 +871,9 @@ function TestimonialsSection() {
               <ChevronLeft className="w-4 h-4" />
             </button>
             <div className="flex items-center gap-2">
-              {TESTIMONIALS.map((item, i) => (
+              {ordered.map((item, i) => (
                 <button
-                  key={item.name}
+                  key={item.id}
                   onClick={() => setIndex(i)}
                   aria-label={`Aller au témoignage ${i + 1}`}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -1126,7 +1063,13 @@ function NewsletterSection({ content }: { content: HomepageNewsletterBanner }) {
 /*  Footer                                                              */
 /* ------------------------------------------------------------------ */
 
-function PremiumFooter() {
+const FOOTER_SOCIAL_ICONS: Record<string, typeof Instagram> = {
+  Instagram: Instagram,
+  Facebook: Facebook,
+  Youtube: Youtube,
+};
+
+function PremiumFooter({ content }: { content: HomepageFooterConfig }) {
   return (
     <footer className="bg-luxe-ink text-white/60">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 pt-20 pb-10">
@@ -1140,10 +1083,7 @@ function PremiumFooter() {
                 Nomad<span className="text-luxe-terracotta italic"> Tours</span>
               </span>
             </div>
-            <p className="text-sm leading-relaxed max-w-xs">
-              Voyages sur-mesure au Bénin et à l&apos;international. Une
-              agence à taille humaine, une exigence sans compromis.
-            </p>
+            <p className="text-sm leading-relaxed max-w-xs">{content.description}</p>
           </div>
 
           <div>
@@ -1159,54 +1099,51 @@ function PremiumFooter() {
             </ul>
           </div>
 
-          <div>
-            <h4 className="text-white font-serif text-base mb-5">Services</h4>
-            <ul className="space-y-3 text-sm">
-              <li>Circuits sur-mesure</li>
-              <li>Billetterie aérienne</li>
-              <li>Assistance e-Visa</li>
-              <li>Événementiel & séminaires</li>
-            </ul>
-          </div>
+          {content.columns.map((column) => (
+            <div key={column.id}>
+              <h4 className="text-white font-serif text-base mb-5">{column.title}</h4>
+              <ul className="space-y-3 text-sm">
+                {column.links.map((link) => (
+                  <li key={link.id}>
+                    <Link href={link.href} className="hover:text-white transition-colors">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
 
           <div>
             <h4 className="text-white font-serif text-base mb-5">Contact</h4>
             <ul className="space-y-3 text-sm">
               <li className="flex items-center gap-2.5">
                 <MapPin className="w-4 h-4 text-luxe-terracotta shrink-0" />
-                Cotonou, Bénin
+                {content.address}
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-luxe-terracotta shrink-0" />
-                +229 01 97 00 00 00
+                {content.phone}
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-luxe-terracotta shrink-0" />
-                contact@nomadtours.bj
+                {content.email}
               </li>
             </ul>
             <div className="flex items-center gap-3 mt-6">
-              <a
-                href="#"
-                aria-label="Instagram"
-                className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:border-luxe-gold hover:text-luxe-gold transition-colors"
-              >
-                <Instagram className="w-4 h-4" strokeWidth={1.5} />
-              </a>
-              <a
-                href="#"
-                aria-label="Facebook"
-                className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:border-luxe-gold hover:text-luxe-gold transition-colors"
-              >
-                <Facebook className="w-4 h-4" strokeWidth={1.5} />
-              </a>
-              <a
-                href="#"
-                aria-label="Youtube"
-                className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:border-luxe-gold hover:text-luxe-gold transition-colors"
-              >
-                <Youtube className="w-4 h-4" strokeWidth={1.5} />
-              </a>
+              {content.socials.map((social) => {
+                const Icon = FOOTER_SOCIAL_ICONS[social.platform] ?? Instagram;
+                return (
+                  <a
+                    key={social.id}
+                    href={social.url}
+                    aria-label={social.platform}
+                    className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:border-luxe-gold hover:text-luxe-gold transition-colors"
+                  >
+                    <Icon className="w-4 h-4" strokeWidth={1.5} />
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -1234,20 +1171,32 @@ function PremiumFooter() {
 export default function LandingPage() {
   const { openQuoteModal } = useQuoteModal();
   const content = useHomepageContent();
+  const testimonials = useTestimonialsStore();
+
+  const sectionRenderers: Record<string, React.ReactNode> = {
+    hero: <HeroSection key="hero" content={content.hero} onOpenQuote={() => openQuoteModal()} />,
+    trustBar: <TrustBar key="trustBar" stats={content.stats} />,
+    services: <ServicesSection key="services" content={content.services} />,
+    destinations: <DestinationsSection key="destinations" content={content.featuredDestinations} />,
+    whyUs: <WhyUsSection key="whyUs" content={content.whyUs} />,
+    featuredCircuit: <FeaturedCircuitSection key="featuredCircuit" content={content.featuredCircuit} />,
+    testimonials: (
+      <TestimonialsSection key="testimonials" content={content.testimonialsConfig} testimonials={testimonials} />
+    ),
+    gallery: <GallerySection key="gallery" />,
+    newsletter: <NewsletterSection key="newsletter" content={content.newsletter} />,
+  };
+
+  const orderedSections = [...content.sectionsOrder]
+    .sort((a, b) => a.order - b.order)
+    .filter((s) => s.enabled)
+    .map((s) => sectionRenderers[s.key]);
 
   return (
     <div className="bg-luxe-sand text-luxe-ink font-sans overflow-x-hidden">
       <PremiumHeader onOpenQuote={() => openQuoteModal()} />
-      <HeroSection content={content.hero} onOpenQuote={() => openQuoteModal()} />
-      <TrustBar stats={content.stats} />
-      <ServicesSection content={content.services} />
-      <DestinationsSection />
-      <WhyUsSection content={content.whyUs} />
-      <FeaturedCircuitSection content={content.featuredCircuit} />
-      <TestimonialsSection />
-      <GallerySection />
-      <NewsletterSection content={content.newsletter} />
-      <PremiumFooter />
+      {orderedSections}
+      <PremiumFooter content={content.footer} />
     </div>
   );
 }

@@ -29,9 +29,10 @@ interface CalendarProps {
   selected?: Date | DateRange;
   onSelect?: (value: Date | DateRange | undefined) => void;
   className?: string;
+  markedDates?: Date[];
 }
 
-export function Calendar({ mode = "single", selected, onSelect, className }: CalendarProps) {
+export function Calendar({ mode = "single", selected, onSelect, className, markedDates }: CalendarProps) {
   const initial =
     mode === "single" ? (selected as Date) : (selected as DateRange | undefined)?.from;
   const [month, setMonth] = React.useState(initial ?? new Date());
@@ -89,13 +90,14 @@ export function Calendar({ mode = "single", selected, onSelect, className }: Cal
             mode === "range" && (
               (range?.from && isSameDay(day, range.from)) || (range?.to && isSameDay(day, range.to))
             );
+          const isMarked = markedDates?.some((d) => isSameDay(d, day));
           return (
             <button
               key={day.toISOString()}
               type="button"
               onClick={() => handleClick(day)}
               className={cn(
-                "h-8 w-8 rounded-md text-xs transition-colors",
+                "relative h-8 w-8 rounded-md text-xs transition-colors",
                 inMonth ? "text-stone-700 dark:text-stone-300" : "text-stone-300 dark:text-stone-700",
                 isSelected && !isEdge && "bg-luxe-terracotta/15 text-luxe-terracotta-dark dark:text-luxe-terracotta",
                 isEdge && "bg-luxe-terracotta text-white font-semibold",
@@ -103,6 +105,9 @@ export function Calendar({ mode = "single", selected, onSelect, className }: Cal
               )}
             >
               {format(day, "d")}
+              {isMarked && (
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-luxe-terracotta" />
+              )}
             </button>
           );
         })}

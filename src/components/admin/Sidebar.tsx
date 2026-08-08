@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   CalendarCheck,
+  CalendarRange,
   Plane,
   MapPinned,
   FileCheck2,
@@ -17,6 +18,8 @@ import {
   FileText,
   ShieldCheck,
   Settings,
+  FileClock,
+  FileBarChart2,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
@@ -24,19 +27,21 @@ import { useAdminRole } from "@/context/AdminRoleContext";
 import { AdminRole } from "@/lib/admin/types";
 import { cn } from "@/lib/utils";
 
-interface NavItem {
+export interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
   roles: AdminRole[];
 }
 
-const NAV_ITEMS: NavItem[] = [
+export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard, roles: ["SUPER_ADMIN", "AGENT"] },
   { label: "Réservations", href: "/admin/reservations", icon: CalendarCheck, roles: ["SUPER_ADMIN", "AGENT"] },
   { label: "Voyages en cours", href: "/admin/voyages", icon: Plane, roles: ["SUPER_ADMIN", "AGENT", "GUIDE"] },
+  { label: "Rapports de voyage", href: "/admin/voyages/rapports", icon: FileBarChart2, roles: ["SUPER_ADMIN", "AGENT"] },
   { label: "Destinations", href: "/admin/destinations", icon: MapPinned, roles: ["SUPER_ADMIN", "AGENT"] },
   { label: "Circuits", href: "/admin/circuits", icon: MapPinned, roles: ["SUPER_ADMIN", "AGENT"] },
+  { label: "Programme annuel", href: "/admin/programme-annuel", icon: CalendarRange, roles: ["SUPER_ADMIN", "AGENT"] },
   { label: "Demandes de Visa", href: "/admin/visas", icon: FileCheck2, roles: ["SUPER_ADMIN", "AGENT"] },
   { label: "Événementiel", href: "/admin/evenementiel", icon: PartyPopper, roles: ["SUPER_ADMIN", "AGENT"] },
   { label: "Clients", href: "/admin/clients", icon: Users, roles: ["SUPER_ADMIN", "AGENT"] },
@@ -45,6 +50,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Paiements", href: "/admin/paiements", icon: Wallet, roles: ["SUPER_ADMIN"] },
   { label: "Contenu (CMS)", href: "/admin/contenu", icon: FileText, roles: ["SUPER_ADMIN"] },
   { label: "Utilisateurs & Rôles", href: "/admin/utilisateurs", icon: ShieldCheck, roles: ["SUPER_ADMIN"] },
+  { label: "Journal d'audit", href: "/admin/journal", icon: FileClock, roles: ["SUPER_ADMIN"] },
   { label: "Paramètres", href: "/admin/parametres", icon: Settings, roles: ["SUPER_ADMIN"] },
 ];
 
@@ -54,6 +60,10 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = React.useState(false);
 
   const items = NAV_ITEMS.filter((item) => item.roles.includes(role));
+  const activeHref = items
+    .map((item) => item.href)
+    .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
+    .sort((a, b) => b.length - a.length)[0];
 
   return (
     <aside
@@ -71,7 +81,7 @@ export function Sidebar() {
 
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
         {items.map((item) => {
-          const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
+          const active = item.href === activeHref;
           const Icon = item.icon;
           return (
             <Link

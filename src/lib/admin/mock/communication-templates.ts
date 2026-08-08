@@ -4,6 +4,7 @@ export const COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   {
     id: "ct-confirmation-reservation",
     name: "Confirmation de réservation",
+    scope: "TRIP",
     phase: "AVANT",
     channel: "EMAIL",
     subject: "Votre voyage {{destination}} est confirmé !",
@@ -12,6 +13,7 @@ export const COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   {
     id: "ct-rappel-documents",
     name: "Rappel documents de voyage",
+    scope: "TRIP",
     phase: "AVANT",
     channel: "EMAIL",
     subject: "Documents nécessaires pour votre départ",
@@ -20,6 +22,7 @@ export const COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   {
     id: "ct-rappel-paiement",
     name: "Rappel solde à payer",
+    scope: "TRIP",
     phase: "AVANT",
     channel: "SMS",
     body: "Bonjour {{prenom}}, il vous reste un solde à régler avant votre départ du {{date_depart}}. Contactez-nous pour finaliser le paiement. Nomad Tours",
@@ -27,6 +30,7 @@ export const COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   {
     id: "ct-guide-assigne",
     name: "Présentation du guide",
+    scope: "TRIP",
     phase: "AVANT",
     channel: "EMAIL",
     subject: "Votre guide pour {{destination}}",
@@ -35,6 +39,7 @@ export const COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   {
     id: "ct-briefing-veille-depart",
     name: "Briefing veille de départ",
+    scope: "TRIP",
     phase: "AVANT",
     channel: "PUSH",
     body: "Départ demain pour {{destination}} ! Rendez-vous au point de rassemblement à l'heure indiquée. Bon voyage avec {{nom_guide}} !",
@@ -42,6 +47,7 @@ export const COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   {
     id: "ct-arrivee-bienvenue",
     name: "Message de bienvenue à l'arrivée",
+    scope: "TRIP",
     phase: "PENDANT",
     channel: "PUSH",
     body: "Bienvenue à {{destination}}, {{prenom}} ! {{nom_guide}} est disponible pour toute question durant votre séjour.",
@@ -49,6 +55,7 @@ export const COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   {
     id: "ct-point-quotidien",
     name: "Point quotidien du guide",
+    scope: "TRIP",
     phase: "PENDANT",
     channel: "PUSH",
     body: "Message du jour de {{nom_guide}} : programme et informations pratiques pour aujourd'hui à {{destination}}.",
@@ -56,6 +63,7 @@ export const COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   {
     id: "ct-changement-itineraire",
     name: "Changement d'itinéraire",
+    scope: "TRIP",
     phase: "PENDANT",
     channel: "SMS",
     body: "Information importante concernant votre itinéraire à {{destination}}. {{nom_guide}} vous communiquera les détails sur place.",
@@ -63,6 +71,7 @@ export const COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   {
     id: "ct-merci-questionnaire",
     name: "Merci + questionnaire de satisfaction",
+    scope: "TRIP",
     phase: "APRES",
     channel: "EMAIL",
     subject: "Merci pour votre voyage à {{destination}} !",
@@ -71,9 +80,34 @@ export const COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   {
     id: "ct-album-photo",
     name: "Album photo disponible",
+    scope: "TRIP",
     phase: "APRES",
     channel: "EMAIL",
     subject: "Votre album photo {{destination}} est prêt",
     body: "Bonjour {{prenom}},\n\nL'album photo de votre voyage à {{destination}} est maintenant disponible. Revivez ces souvenirs !\n\nL'équipe Nomad Tours",
+  },
+  {
+    id: "ct-sys-bienvenue-newsletter",
+    name: "Bienvenue newsletter",
+    scope: "SYSTEM",
+    channel: "EMAIL",
+    subject: "Bienvenue chez Nomad Tours !",
+    body: "Bonjour,\n\nMerci de vous être inscrit(e) à la newsletter Nomad Tours. Vous recevrez nos meilleures offres et actualités sur le tourisme au Bénin.\n\nL'équipe Nomad Tours",
+  },
+  {
+    id: "ct-sys-confirmation-visa",
+    name: "Confirmation de demande de visa",
+    scope: "SYSTEM",
+    channel: "EMAIL",
+    subject: "Votre demande de visa a bien été reçue",
+    body: "Bonjour {{prenom}},\n\nNous avons bien reçu votre demande de visa. Notre équipe vous recontactera sous 48h avec les prochaines étapes.\n\nL'équipe Nomad Tours",
+  },
+  {
+    id: "ct-sys-confirmation-evenement",
+    name: "Confirmation de demande événementielle",
+    scope: "SYSTEM",
+    channel: "EMAIL",
+    subject: "Votre demande d'événement a bien été reçue",
+    body: "Bonjour {{prenom}},\n\nMerci pour votre demande concernant votre événement. Un membre de notre équipe événementiel vous contactera prochainement.\n\nL'équipe Nomad Tours",
   },
 ];

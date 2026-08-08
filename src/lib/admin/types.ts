@@ -176,6 +176,79 @@ export interface Trip {
   feedbacks: TripFeedback[];
 }
 
+export type TripReportStatus = "DRAFT" | "FINALIZED";
+
+export type TripReportSectionKey =
+  | "INFOS_GENERALES"
+  | "CAMPAGNE_COMMUNICATION"
+  | "INSCRIPTIONS_PARTICIPANTS"
+  | "PREPARATIFS_DOCUMENTS"
+  | "BILLETTERIE_AERIENNE"
+  | "ARRIVEE_DESTINATION"
+  | "HEBERGEMENT"
+  | "RESTAURATION"
+  | "DEPLACEMENTS"
+  | "PROGRAMME_ACTIVITES"
+  | "ENCADREMENT"
+  | "RETOUR_SOUVENIRS"
+  | "SATISFACTION_AVIS"
+  | "BILAN_FINANCIER"
+  | "RECOMMANDATIONS";
+
+// Uniquement les champs sans source de données existante dans ce dépôt.
+// Tout le reste est calculé en direct depuis trips/bookings/tasks/suppliers/
+// feedbacks à chaque rendu (voir les fonctions getXxx dans trips-store.ts) —
+// jamais persisté ici, donc jamais désynchronisé.
+export interface TripReportManualFields {
+  redacteur?: string;
+  dateRedaction?: string;
+  canauxCommunication?: string;
+  budgetCommunication?: string;
+  resultatsCampagne?: string;
+  desistements?: string;
+  raisonsDesistement?: string;
+  appreciationPreparatifs?: string;
+  statutVisa?: string;
+  compagnieAerienne?: string;
+  referenceBillet?: string;
+  notesBilletterie?: string;
+  dateHeureArrivee?: string;
+  accueilPar?: string;
+  incidentsArrivee?: string;
+  qualitePerçueHebergement?: number;
+  notesHebergement?: string;
+  notesRestauration?: string;
+  fiabiliteTransport?: number;
+  incidentsTransport?: string;
+  ecartsProgramme?: string;
+  appreciationEncadrement?: string;
+  commentaireSouvenirs?: string;
+  syntheseSatisfaction?: string;
+  reclamations?: string;
+  analyseEcartsFinanciers?: string;
+  recommandations?: string;
+}
+
+export interface TripReportActionItem {
+  id: string;
+  reportId: string;
+  label: string;
+  done: boolean;
+  createdAt: string;
+}
+
+export interface TripReport {
+  id: string;
+  tripId: string;
+  status: TripReportStatus;
+  manual: TripReportManualFields;
+  generatedAt: string;
+  generatedBy: string;
+  finalizedAt?: string;
+  finalizedBy?: string;
+  updatedAt: string;
+}
+
 export interface PointOfInterest {
   id: string;
   name: string;
@@ -367,6 +440,30 @@ export interface AgencySettings {
   darkMode: boolean;
 }
 
+export interface PaymentSettings {
+  fedapayEnabled: boolean;
+  fedapayPublicKey: string;
+  fedapaySecretKey: string;
+  stripeEnabled: boolean;
+  stripePublishableKey: string;
+  stripeSecretKey: string;
+  mobileMoneyMtnEnabled: boolean;
+  mobileMoneyMtnNumber: string;
+  mobileMoneyMoovEnabled: boolean;
+  mobileMoneyMoovNumber: string;
+  bankTransferEnabled: boolean;
+  bankName: string;
+  bankIban: string;
+  bankBic: string;
+}
+
+export interface CurrencyRate {
+  id: string;
+  code: string;
+  label: string;
+  rateToXOF: number;
+}
+
 export type HomepageIconKey = "COMPASS" | "PLANE" | "FILE_CHECK" | "PARTY_POPPER" | "HEADPHONES" | "WALLET";
 
 export interface HomepageHero {
@@ -434,6 +531,62 @@ export interface HomepageNewsletterBanner {
   disclaimer: string;
 }
 
+export type HomepageSectionKey =
+  | "hero"
+  | "trustBar"
+  | "services"
+  | "destinations"
+  | "whyUs"
+  | "featuredCircuit"
+  | "testimonials"
+  | "gallery"
+  | "newsletter";
+
+export interface HomepageSectionMeta {
+  key: HomepageSectionKey;
+  enabled: boolean;
+  order: number;
+}
+
+export interface HomepageFeaturedDestinationsSection {
+  eyebrow: string;
+  title: string;
+  destinationIds: string[];
+}
+
+export interface HomepageTestimonialsConfig {
+  eyebrow: string;
+  title: string;
+  testimonialIds: string[];
+}
+
+export interface HomepageFooterLink {
+  id: string;
+  label: string;
+  href: string;
+}
+
+export interface HomepageFooterColumn {
+  id: string;
+  title: string;
+  links: HomepageFooterLink[];
+}
+
+export interface HomepageFooterSocialLink {
+  id: string;
+  platform: string;
+  url: string;
+}
+
+export interface HomepageFooterConfig {
+  description: string;
+  address: string;
+  phone: string;
+  email: string;
+  columns: HomepageFooterColumn[];
+  socials: HomepageFooterSocialLink[];
+}
+
 export interface HomepageContent {
   hero: HomepageHero;
   stats: HomepageStat[];
@@ -441,6 +594,21 @@ export interface HomepageContent {
   whyUs: HomepageWhyUsSection;
   featuredCircuit: HomepagePromoBanner;
   newsletter: HomepageNewsletterBanner;
+  sectionsOrder: HomepageSectionMeta[];
+  featuredDestinations: HomepageFeaturedDestinationsSection;
+  testimonialsConfig: HomepageTestimonialsConfig;
+  footer: HomepageFooterConfig;
+}
+
+export type HomepageVersionStatus = "DRAFT" | "PUBLISHED";
+
+export interface HomepageContentVersion {
+  id: string;
+  content: HomepageContent;
+  status: HomepageVersionStatus;
+  publishedAt: string | null;
+  actor: string;
+  createdAt: string;
 }
 
 export type TestimonialStatus = "PENDING" | "APPROVED" | "REJECTED";
@@ -456,26 +624,46 @@ export interface AdminTestimonial {
   status: TestimonialStatus;
 }
 
-export type BlogPostStatus = "DRAFT" | "PUBLISHED";
-
-export interface AdminBlogPost {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  coverImage: string;
-  category: string;
-  authorName: string;
-  publishedAt: string;
-  readTimeMinutes: number;
-  status: BlogPostStatus;
-}
-
 export interface CmsSeoSettings {
   siteTitle: string;
   metaDescription: string;
   ogImage?: string;
+}
+
+export type BannerPlacement = "HOMEPAGE_TOP" | "HOMEPAGE_INLINE" | "CIRCUITS" | "DESTINATIONS" | "SITE_WIDE";
+
+export interface Banner {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  ctaLabel: string;
+  ctaHref: string;
+  placement: BannerPlacement;
+  startDate: string | null;
+  endDate: string | null;
+  active: boolean;
+  createdAt: string;
+}
+
+export type NewsletterSubscriberStatus = "ACTIVE" | "DISABLED";
+
+export interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  name?: string;
+  source: string;
+  subscribedAt: string;
+  status: NewsletterSubscriberStatus;
+}
+
+export interface AdminNotification {
+  id: string;
+  title: string;
+  description?: string;
+  href?: string;
+  read: boolean;
+  createdAt: string;
 }
 
 export type TaskPhase = "AVANT" | "PENDANT" | "APRES";
@@ -486,13 +674,30 @@ export type CommChannel = "EMAIL" | "SMS" | "PUSH";
 export type CommTriggerMode = "AUTO" | "VALIDATION" | "MANUEL";
 export type CommStatus = "PROGRAMMEE" | "EN_ATTENTE_VALIDATION" | "ENVOYEE" | "ANNULEE";
 
+export type CommTemplateScope = "TRIP" | "SYSTEM";
+
 export interface CommunicationTemplate {
   id: string;
   name: string;
-  phase: TaskPhase;
+  scope: CommTemplateScope;
+  phase?: TaskPhase;
   channel: CommChannel;
   subject?: string;
   body: string;
+}
+
+export type SupplierType = "HEBERGEMENT" | "TRANSPORT" | "GUIDE_LOCAL" | "RESTAURATION" | "AUTRE";
+
+export interface Supplier {
+  id: string;
+  name: string;
+  type: SupplierType;
+  contactName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  notes?: string;
+  active: boolean;
+  createdAt: string;
 }
 
 export interface TaskTemplateItem {
@@ -504,7 +709,7 @@ export interface TaskTemplateItem {
   assigneeRole: string;
   priority: TaskPriority;
   subItems: string[];
-  supplierTag?: string;
+  supplierId?: string;
   communicationTemplateId?: string;
   communicationTrigger?: CommTriggerMode;
 }
@@ -544,7 +749,7 @@ export interface TripTask {
   status: TaskStatus;
   priority: TaskPriority;
   subItems: TripTaskSubItem[];
-  supplierTag?: string;
+  supplierId?: string;
   attachments: TripTaskAttachment[];
   communicationTemplateId?: string;
   communicationTrigger?: CommTriggerMode;
@@ -583,6 +788,13 @@ export interface TripTimelineEntry {
   date: string;
 }
 
+export type CircuitCategory =
+  | "ESCAPADE_LOCALE"
+  | "GRAND_CIRCUIT_BENIN"
+  | "REGIONAL"
+  | "INTERNATIONAL"
+  | "EVENEMENTIEL";
+
 export interface Circuit {
   id: string;
   slug: string;
@@ -593,6 +805,7 @@ export interface Circuit {
   priceXOF: number;
   priceEUR?: number;
   theme: "Culture" | "Safari" | "Plage" | "Aventure" | "Événement";
+  category: CircuitCategory;
   isFeatured: boolean;
   images: string[];
   itinerary: ItineraryDay[];
@@ -601,7 +814,7 @@ export interface Circuit {
   priceTiers: PriceTier[];
   options: CircuitOption[];
   departures: CircuitDeparture[];
-  guide?: CircuitGuide;
+  guides?: CircuitGuide[];
   seoTitle?: string;
   seoDescription?: string;
   bookingsCount: number;

@@ -270,5 +270,186 @@ export const DESTINATIONS: Destination[] = [
     startingPriceXOF: 480000,
     rating: 4.8,
     reviewsCount: 65
+  },
+  {
+    id: "dest-lac-aheme",
+    slug: "lac-aheme-possotome",
+    name: "Lac Ahémé & Possotomè",
+    country: "Bénin",
+    region: "Mono/Couffo / Sud-Ouest Bénin",
+    description: "Deuxième plus grand lac du Bénin, entouré de villages de pêcheurs et de la source thermale sacrée de Possotomè. Un cadre paisible et verdoyant, parfait pour une parenthèse nature entre sortie en pirogue et bains reminéralisants.",
+    highlights: [
+      "Sortie en pirogue silencieuse au coucher du soleil sur le lac Ahémé",
+      "Baignade et cure reminéralisante à la source thermale de Possotomè",
+      "Rencontre avec les communautés de pêcheurs et démonstration de pêche traditionnelle",
+      "Dégustation de la gastronomie lacustre locale (poisson fumé, ahouyo)"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
+    ],
+    climate: "Tropical humide tempéré par le lac, 26°C à 29°C",
+    bestPeriod: "Novembre à Mars (Saison sèche)",
+    isInternational: false,
+    isFeatured: true,
+    latitude: 6.5500,
+    longitude: 1.8833,
+    startingPriceXOF: 30000,
+    rating: 4.7,
+    reviewsCount: 58
+  },
+  {
+    id: "dest-cotonou",
+    slug: "cotonou-capitale-economique",
+    name: "Cotonou",
+    country: "Bénin",
+    region: "Littoral / Capitale économique",
+    description: "Capitale économique trépidante du Bénin, Cotonou séduit par l'effervescence de son grand marché de Dantokpa, sa scène artistique contemporaine et son ambiance afrobeat qui anime les soirées jusqu'au bout de la nuit.",
+    highlights: [
+      "Immersion dans le tourbillon du marché de Dantokpa, l'un des plus grands d'Afrique de l'Ouest",
+      "Visite de la Fondation Zinsou et de sa collection d'art contemporain africain",
+      "Découverte de l'artisanat local au Centre de Promotion de l'Artisanat",
+      "Soirées animées et musique afrobeat dans les quartiers de Fidjrossè et Haie Vive"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80"
+    ],
+    climate: "Littoral tropical humide, 26°C à 31°C",
+    bestPeriod: "Toute l'année",
+    isInternational: false,
+    isFeatured: false,
+    latitude: 6.3703,
+    longitude: 2.3912,
+    startingPriceXOF: 15000,
+    rating: 4.5,
+    reviewsCount: 203
+  },
+  {
+    id: "dest-nikki",
+    slug: "nikki-fete-gaani",
+    name: "Nikki",
+    country: "Bénin",
+    region: "Borgou / Nord-Est Bénin",
+    description: "Cité royale du peuple Baatonu, Nikki est le cœur battant de l'identité du Nord-Bénin. Chaque année, la ville s'embrase pour le Gaani, grande fête traditionnelle rythmée par les parades équestres et les cérémonies de la Cour impériale.",
+    highlights: [
+      "Assister aux impressionnantes parades équestres de la fête du Gaani",
+      "Rencontre protocolaire avec les dignitaires de la Cour impériale de Nikki",
+      "Découverte de l'artisanat du cuir et des tissages Baatonu",
+      "Immersion dans les rythmes des tambours royaux et danses traditionnelles"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=1200&q=80"
+    ],
+    climate: "Soudanien sec, jusqu'à 34°C en journée",
+    bestPeriod: "Fin Août (Fête traditionnelle du Gaani)",
+    isInternational: false,
+    isFeatured: false,
+    latitude: 9.9401,
+    longitude: 3.2108,
+    startingPriceXOF: 90000,
+    rating: 4.8,
+    reviewsCount: 41
+  },
+  {
+    id: "dest-togo-kpalime",
+    slug: "kpalime-mont-agou-togo",
+    name: "Kpalimè & Mont Agou (Togo)",
+    country: "Togo",
+    region: "Région des Plateaux",
+    description: "À deux pas du Bénin, Kpalimè séduit par ses collines verdoyantes, ses plantations de café et de cacao, et l'ascension accessible du Mont Agou, point culminant du Togo. Une extension nature idéale depuis Lomé.",
+    highlights: [
+      "Randonnée jusqu'au sommet du Mont Agou (986m), plus haut sommet du Togo",
+      "Visite d'une plantation de café et cacao artisanale avec dégustation",
+      "Baignade aux cascades rafraîchissantes de Kpimè",
+      "Shopping animé au grand marché des Nana-Benz à Lomé"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80"
+    ],
+    climate: "Tempéré d'altitude, plus frais que la côte, 22°C à 28°C",
+    bestPeriod: "Novembre à Avril",
+    isInternational: true,
+    isFeatured: true,
+    startingPriceXOF: 200000,
+    rating: 4.7,
+    reviewsCount: 39
+  },
+  {
+    id: "dest-cote-ivoire",
+    slug: "abidjan-grand-bassam-cote-ivoire",
+    name: "Abidjan & Grand-Bassam (Côte d'Ivoire)",
+    country: "Côte d'Ivoire",
+    region: "Afrique de l'Ouest",
+    description: "Entre le dynamisme de la 'Perle des Lagunes' Abidjan et le charme colonial classé UNESCO de Grand-Bassam, découvrez une Côte d'Ivoire contrastée : gratte-ciels, basilique monumentale et plages bordées de cocotiers.",
+    highlights: [
+      "Panorama sur les gratte-ciels du Plateau depuis la lagune Ébrié",
+      "Visite de la spectaculaire Basilique Notre-Dame de la Paix à Yamoussoukro",
+      "Balade dans la ville coloniale classée UNESCO de Grand-Bassam",
+      "Détente sur les plages de Grand-Bassam et découverte de l'art local"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80"
+    ],
+    climate: "Équatorial humide, 25°C à 31°C",
+    bestPeriod: "Novembre à Avril",
+    isInternational: true,
+    isFeatured: false,
+    startingPriceXOF: 600000,
+    rating: 4.6,
+    reviewsCount: 33
+  },
+  {
+    id: "dest-kenya-maasai-mara",
+    slug: "maasai-mara-kenya",
+    name: "Maasai Mara (Kenya)",
+    country: "Kenya",
+    region: "Afrique de l'Est",
+    description: "Théâtre de la grande migration des gnous, la réserve du Maasai Mara offre l'une des expériences safari les plus spectaculaires au monde, prolongée par la rencontre authentique des communautés Maasaï.",
+    highlights: [
+      "Safari en 4x4 à la rencontre des Big Five dans la savane du Maasai Mara",
+      "Observation de la Grande Migration des gnous (juillet à octobre)",
+      "Visite culturelle d'un village Maasaï et de ses traditions ancestrales",
+      "Survol optionnel en montgolfière au lever du soleil sur la réserve"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=1200&q=80"
+    ],
+    climate: "Tropical de savane tempéré par l'altitude, 20°C à 27°C",
+    bestPeriod: "Juillet à Octobre (Grande Migration)",
+    isInternational: true,
+    isFeatured: true,
+    startingPriceXOF: 1250000,
+    rating: 4.9,
+    reviewsCount: 57
+  },
+  {
+    id: "dest-maroc-marrakech",
+    slug: "marrakech-desert-maroc",
+    name: "Marrakech & Désert (Maroc)",
+    country: "Maroc",
+    region: "Afrique du Nord",
+    description: "La ville rouge et ses souks envoûtants, la traversée de la vallée de l'Atlas et une nuit magique sous les étoiles du désert : le Maroc offre un dépaysement total entre culture impériale et immensités sahariennes.",
+    highlights: [
+      "Immersion dans les souks animés et les jardins secrets de la médina de Marrakech",
+      "Traversée panoramique de la vallée de l'Atlas et ses cols vertigineux",
+      "Nuit sous tente berbère dans le désert d'Agafay ou de Merzouga",
+      "Balade à dos de dromadaire au coucher du soleil sur les dunes"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80"
+    ],
+    climate: "Semi-aride, chaud et sec, 20°C à 35°C selon saison",
+    bestPeriod: "Mars à Mai et Septembre à Novembre",
+    isInternational: true,
+    isFeatured: true,
+    startingPriceXOF: 980000,
+    rating: 4.8,
+    reviewsCount: 71
   }
 ];

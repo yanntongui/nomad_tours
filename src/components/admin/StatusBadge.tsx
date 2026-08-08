@@ -74,6 +74,11 @@ const STATUS_MAP: Record<string, { label: string; variant: StatusVariant }> = {
   SILVER: { label: "Argent", variant: "blue" },
   GOLD: { label: "Or", variant: "amber" },
   PLATINUM: { label: "Platine", variant: "terracotta" },
+  // Journal d'audit — sources
+  RESERVATION: { label: "Réservation", variant: "blue" },
+  VISA: { label: "Visa", variant: "terracotta" },
+  EVENEMENT: { label: "Événementiel", variant: "amber" },
+  VOYAGE: { label: "Voyage", variant: "emerald" },
 };
 
 export function StatusBadge({ status, label }: { status: string; label?: string }) {

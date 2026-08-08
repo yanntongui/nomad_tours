@@ -19,16 +19,14 @@ import {
 } from "lucide-react";
 import { CIRCUITS } from "@/lib/data/circuits";
 import GalleryModal from "@/components/GalleryModal";
+import { useQuoteModal } from "@/context/QuoteModalContext";
 
 interface CircuitDetailPageProps {
   params: { slug: string };
-  onOpenQuoteModal?: (destId?: string, circId?: string) => void;
 }
 
-export default function CircuitDetailPage({
-  params,
-  onOpenQuoteModal,
-}: CircuitDetailPageProps) {
+export default function CircuitDetailPage({ params }: CircuitDetailPageProps) {
+  const { openQuoteModal: onOpenQuoteModal } = useQuoteModal();
   const circuit = CIRCUITS.find((c) => c.slug === params.slug || c.id === params.slug);
   const [expandedDay, setExpandedDay] = useState<number | null>(1);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);

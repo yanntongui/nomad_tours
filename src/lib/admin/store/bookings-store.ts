@@ -9,6 +9,7 @@ import {
   INTERNAL_NOTES as INITIAL_NOTES,
   DOCUMENTS as INITIAL_DOCUMENTS,
 } from "@/lib/admin/mock/bookings";
+import { pushNotification } from "@/lib/admin/store/notifications-store";
 import {
   Booking,
   BookingDocument,
@@ -74,9 +75,18 @@ export function getBooking(id: string) {
   return state.bookings.find((b) => b.id === id);
 }
 
+export function getBookingPayments(bookingId: string): Payment[] {
+  return state.payments.filter((p) => p.bookingId === bookingId);
+}
+
 export function addBooking(booking: Booking, actor: string) {
   state.bookings = [booking, ...state.bookings];
   logTimeline(booking.id, "Réservation créée", `Réservation ${booking.bookingNumber} — ${booking.referenceLabel}`, actor);
+  pushNotification({
+    title: "Nouvelle réservation",
+    description: `${booking.bookingNumber} — ${booking.referenceLabel}`,
+    href: `/admin/reservations/${booking.id}`,
+  });
   emit();
 }
 
@@ -96,6 +106,13 @@ export function toggleUrgent(id: string, actor: string) {
   state.bookings = state.bookings.map((b) => (b.id === id ? { ...b, urgent: !b.urgent } : b));
   const booking = state.bookings.find((b) => b.id === id);
   logTimeline(id, booking?.urgent ? "Marquée urgente" : "Retirée des urgences", undefined, actor);
+  if (booking?.urgent) {
+    pushNotification({
+      title: "Réservation marquée urgente",
+      description: booking.referenceLabel,
+      href: `/admin/reservations/${id}`,
+    });
+  }
   emit();
 }
 

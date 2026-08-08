@@ -1,6 +1,16 @@
 import { CIRCUITS as PUBLIC_CIRCUITS } from "@/lib/data/circuits";
 import { GUIDES } from "@/lib/admin/mock/users";
-import { Circuit } from "@/lib/admin/types";
+import { Circuit, CircuitCategory } from "@/lib/admin/types";
+
+const REGIONAL_DESTINATION_IDS = new Set(["dest-togo-kpalime", "dest-ghana-accra", "dest-cote-ivoire"]);
+const INTERNATIONAL_DESTINATION_IDS = new Set(["dest-afrique-sud", "dest-kenya-maasai-mara", "dest-maroc-marrakech"]);
+
+function categoryFor(c: { theme: string; destinationId: string; durationDays: number }): CircuitCategory {
+  if (c.theme === "Événement") return "EVENEMENTIEL";
+  if (REGIONAL_DESTINATION_IDS.has(c.destinationId)) return "REGIONAL";
+  if (INTERNATIONAL_DESTINATION_IDS.has(c.destinationId)) return "INTERNATIONAL";
+  return c.durationDays <= 3 ? "ESCAPADE_LOCALE" : "GRAND_CIRCUIT_BENIN";
+}
 
 function departuresFor(circuitIndex: number): Circuit["departures"] {
   const base = [
@@ -35,6 +45,7 @@ export const ADMIN_CIRCUITS: Circuit[] = PUBLIC_CIRCUITS.map((c, i) => ({
   priceXOF: c.priceXOF,
   priceEUR: c.priceEUR,
   theme: c.theme,
+  category: categoryFor(c),
   isFeatured: !!c.isFeatured,
   images: c.images,
   itinerary: c.itinerary.map((day, j) => ({
@@ -57,9 +68,9 @@ export const ADMIN_CIRCUITS: Circuit[] = PUBLIC_CIRCUITS.map((c, i) => ({
     { id: `${c.id}-opt-2`, label: "Transfert aéroport privé", priceXOF: 20000 },
   ],
   departures: departuresFor(i),
-  guide: GUIDES[i % GUIDES.length]
-    ? { guideId: GUIDES[i % GUIDES.length].id, guideName: GUIDES[i % GUIDES.length].name }
-    : undefined,
+  guides: GUIDES[i % GUIDES.length]
+    ? [{ guideId: GUIDES[i % GUIDES.length].id, guideName: GUIDES[i % GUIDES.length].name }]
+    : [],
   seoTitle: `${c.title} | Nomad Tours`,
   seoDescription: c.included[0] ?? c.title,
   bookingsCount: 8 + i * 5,

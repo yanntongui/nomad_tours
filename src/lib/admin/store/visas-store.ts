@@ -1,6 +1,7 @@
 "use client";
 import { useSyncExternalStore } from "react";
 import { VISA_REQUESTS as INITIAL_REQUESTS, VISA_TIMELINE as INITIAL_TIMELINE } from "@/lib/admin/mock/visas";
+import { pushNotification } from "@/lib/admin/store/notifications-store";
 import { ClientRef, VisaDocument, VisaRequest, VisaStatus, VisaTimelineEntry } from "@/lib/admin/types";
 
 interface State {
@@ -95,6 +96,11 @@ export function createVisaRequest(
   };
   state.requests = [request, ...state.requests];
   logTimeline(request.id, "Dossier soumis", `Demande de visa ${input.country}`, actor);
+  pushNotification({
+    title: "Nouvelle demande de visa",
+    description: `${input.client.name} — ${input.country}`,
+    href: `/admin/visas/${request.id}`,
+  });
   emit();
   return request;
 }

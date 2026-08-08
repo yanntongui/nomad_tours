@@ -4,12 +4,10 @@ import Link from "next/link";
 import { Search, Compass, Filter, Clock, CheckCircle, Send, ArrowRight } from "lucide-react";
 import { CIRCUITS } from "@/lib/data/circuits";
 import CircuitCard from "@/components/CircuitCard";
+import { useQuoteModal } from "@/context/QuoteModalContext";
 
-interface CircuitsPageProps {
-  onOpenQuoteModal?: (destId?: string, circId?: string) => void;
-}
-
-export default function CircuitsPage({ onOpenQuoteModal }: CircuitsPageProps) {
+export default function CircuitsPage() {
+  const { openQuoteModal: onOpenQuoteModal } = useQuoteModal();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTheme, setSelectedTheme] = useState("ALL");
   const [maxDuration, setMaxDuration] = useState("ALL");

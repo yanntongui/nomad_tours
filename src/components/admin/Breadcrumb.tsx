@@ -15,6 +15,7 @@ const LABELS: Record<string, string> = {
   paiements: "Paiements",
   contenu: "Contenu (CMS)",
   utilisateurs: "Utilisateurs & Rôles",
+  journal: "Journal d'audit",
   parametres: "Paramètres",
   new: "Nouveau",
 };

@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,10 +24,15 @@ import {
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { TagListInput } from "@/components/admin/TagListInput";
 import { DragDropList } from "@/components/admin/DragDropList";
-import { upsertTaskTemplate } from "@/lib/admin/store/task-templates-store";
-import { useCommunicationTemplates } from "@/lib/admin/store/communication-templates-store";
-import { TASK_TEMPLATES } from "@/lib/admin/mock/task-templates";
-import { TaskTemplate, TaskTemplateItem, TaskCategory, TaskPhase, TaskPriority, CommTriggerMode } from "@/lib/admin/types";
+import { createTaskTemplateAction, updateTaskTemplateAction } from "@/app/admin/(dashboard)/voyages/modeles/actions";
+import type { TaskTemplateRow } from "@/lib/server/task-templates";
+import type { CommunicationTemplateRow } from "@/components/admin/CommTemplateFormDialog";
+import type { Enums } from "@/lib/server/types";
+
+type TaskPhase = Enums<"task_phase">;
+type TaskCategory = Enums<"task_category">;
+type TaskPriority = Enums<"task_priority">;
+type CommTriggerMode = Enums<"comm_trigger_mode">;
 
 const THEMES = ["Culture", "Safari", "Plage", "Aventure", "Événement"] as const;
 
@@ -43,8 +47,6 @@ const CATEGORY_LABELS: Record<TaskCategory, string> = {
 const PRIORITY_LABELS: Record<TaskPriority, string> = { NORMALE: "Normale", URGENTE: "Urgente" };
 const TRIGGER_LABELS: Record<CommTriggerMode, string> = { AUTO: "Automatique", VALIDATION: "Avec validation agent", MANUEL: "Manuel groupé" };
 
-const ALL_ITEM_TITLES = Array.from(new Set(TASK_TEMPLATES.flatMap((t) => t.items.map((i) => i.title))));
-
 function dueOffsetLabel(offset: number) {
   if (offset === 0) return "Jour 1 (arrivée)";
   if (offset < 0) return `J-${Math.abs(offset)}`;
@@ -52,22 +54,58 @@ function dueOffsetLabel(offset: number) {
 }
 
 let itemSeq = 0;
-function newItemId() {
+function newTempId() {
   itemSeq += 1;
-  return `tti-new-${itemSeq}`;
+  return `tti-new-${Date.now()}-${itemSeq}`;
 }
 
-function emptyItem(): TaskTemplateItem {
+interface ItemDraft {
+  id: string;
+  title: string;
+  phase: TaskPhase;
+  category: TaskCategory;
+  due_offset_days: number;
+  assignee_role: string;
+  priority: TaskPriority;
+  sub_items: string[];
+  supplier_tag: string | null;
+  communication_template_id: string | null;
+  communication_trigger: CommTriggerMode | null;
+}
+
+function emptyItem(): ItemDraft {
   return {
-    id: newItemId(),
+    id: newTempId(),
     title: "",
     phase: "AVANT",
     category: "LOGISTIQUE",
-    dueOffsetDays: -30,
-    assigneeRole: "AGENT",
+    due_offset_days: -30,
+    assignee_role: "AGENT",
     priority: "NORMALE",
-    subItems: [],
+    sub_items: [],
+    supplier_tag: null,
+    communication_template_id: null,
+    communication_trigger: null,
   };
+}
+
+function toItemDrafts(rows: TaskTemplateRow["task_template_items"]): ItemDraft[] {
+  return rows
+    .slice()
+    .sort((a, b) => a.position - b.position)
+    .map((r) => ({
+      id: r.id,
+      title: r.title,
+      phase: r.phase,
+      category: r.category,
+      due_offset_days: r.due_offset_days,
+      assignee_role: r.assignee_role,
+      priority: r.priority,
+      sub_items: r.sub_items ?? [],
+      supplier_tag: r.supplier_tag,
+      communication_template_id: r.communication_template_id,
+      communication_trigger: r.communication_trigger,
+    }));
 }
 
 function ItemEditDialog({
@@ -75,24 +113,26 @@ function ItemEditDialog({
   onOpenChange,
   item,
   onSave,
+  commTemplates,
+  titleSuggestions,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: TaskTemplateItem | null;
-  onSave: (item: TaskTemplateItem) => void;
+  item: ItemDraft | null;
+  onSave: (item: ItemDraft) => void;
+  commTemplates: CommunicationTemplateRow[];
+  titleSuggestions: string[];
 }) {
-  const [draft, setDraft] = React.useState<TaskTemplateItem>(item ?? emptyItem());
-  const commTemplates = useCommunicationTemplates();
+  const [draft, setDraft] = React.useState<ItemDraft>(item ?? emptyItem());
 
   React.useEffect(() => {
     if (open) setDraft(item ?? emptyItem());
   }, [open, item]);
 
-  function set<K extends keyof TaskTemplateItem>(key: K, value: TaskTemplateItem[K]) {
+  function set<K extends keyof ItemDraft>(key: K, value: ItemDraft[K]) {
     setDraft((d) => ({ ...d, [key]: value }));
   }
 
-  const titleSuggestions = ALL_ITEM_TITLES;
   const valid = draft.title.trim().length > 0;
 
   return (
@@ -145,10 +185,10 @@ function ItemEditDialog({
               <Label>Échéance relative (jours)</Label>
               <Input
                 type="number"
-                value={draft.dueOffsetDays}
-                onChange={(e) => set("dueOffsetDays", Number(e.target.value))}
+                value={draft.due_offset_days}
+                onChange={(e) => set("due_offset_days", Number(e.target.value))}
               />
-              <p className="text-xs text-stone-400 dark:text-stone-500">{dueOffsetLabel(draft.dueOffsetDays)}</p>
+              <p className="text-xs text-stone-400 dark:text-stone-500">{dueOffsetLabel(draft.due_offset_days)}</p>
             </div>
             <div className="space-y-1.5">
               <Label>Priorité</Label>
@@ -165,23 +205,27 @@ function ItemEditDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Rôle assigné</Label>
-              <Input value={draft.assigneeRole} onChange={(e) => set("assigneeRole", e.target.value)} placeholder="AGENT, GUIDE..." />
+              <Input value={draft.assignee_role} onChange={(e) => set("assignee_role", e.target.value)} placeholder="AGENT, GUIDE..." />
             </div>
             <div className="space-y-1.5">
-              <Label>Fournisseur lié</Label>
-              <Input value={draft.supplierTag ?? ""} onChange={(e) => set("supplierTag", e.target.value || undefined)} placeholder="Ex. Hébergement" />
+              <Label>Fournisseur (tag libre)</Label>
+              <Input
+                value={draft.supplier_tag ?? ""}
+                onChange={(e) => set("supplier_tag", e.target.value.trim() ? e.target.value : null)}
+                placeholder="Ex. Lodge Pendjari"
+              />
             </div>
           </div>
           <div className="space-y-1.5">
             <Label>Sous-tâches</Label>
-            <TagListInput tags={draft.subItems} onChange={(v) => set("subItems", v)} placeholder="Ajouter une sous-tâche et appuyer sur Entrée..." />
+            <TagListInput tags={draft.sub_items} onChange={(v) => set("sub_items", v)} placeholder="Ajouter une sous-tâche et appuyer sur Entrée..." />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Modèle de communication</Label>
               <Select
-                value={draft.communicationTemplateId ?? "NONE"}
-                onValueChange={(v) => set("communicationTemplateId", v === "NONE" ? undefined : v)}
+                value={draft.communication_template_id ?? "NONE"}
+                onValueChange={(v) => set("communication_template_id", v === "NONE" ? null : v)}
               >
                 <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
                 <SelectContent>
@@ -195,9 +239,9 @@ function ItemEditDialog({
             <div className="space-y-1.5">
               <Label>Déclenchement</Label>
               <Select
-                value={draft.communicationTrigger ?? "NONE"}
-                onValueChange={(v) => set("communicationTrigger", v === "NONE" ? undefined : (v as CommTriggerMode))}
-                disabled={!draft.communicationTemplateId}
+                value={draft.communication_trigger ?? "NONE"}
+                onValueChange={(v) => set("communication_trigger", v === "NONE" ? null : (v as CommTriggerMode))}
+                disabled={!draft.communication_template_id}
               >
                 <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
                 <SelectContent>
@@ -219,23 +263,48 @@ function ItemEditDialog({
   );
 }
 
-interface TaskTemplateFormProps {
-  initial: TaskTemplate;
-  mode: "create" | "edit";
+interface FormValues {
+  name: string;
+  circuit_theme: string | null;
 }
 
-export function TaskTemplateForm({ initial, mode }: TaskTemplateFormProps) {
-  const router = useRouter();
-  const [form, setForm] = React.useState<TaskTemplate>(initial);
-  const [editingItem, setEditingItem] = React.useState<TaskTemplateItem | null>(null);
-  const [dialogOpen, setDialogOpen] = React.useState(false);
+function toFormValues(initial: TaskTemplateRow | null): FormValues {
+  return { name: initial?.name ?? "", circuit_theme: initial?.circuit_theme ?? null };
+}
 
-  function set<K extends keyof TaskTemplate>(key: K, value: TaskTemplate[K]) {
+interface TaskTemplateFormProps {
+  initial: TaskTemplateRow | null;
+  mode: "create" | "edit";
+  commTemplates: CommunicationTemplateRow[];
+  itemTitleSuggestions: string[];
+}
+
+export function TaskTemplateForm({ initial, mode, commTemplates, itemTitleSuggestions }: TaskTemplateFormProps) {
+  const router = useRouter();
+  const [form, setForm] = React.useState<FormValues>(() => toFormValues(initial));
+  const [items, setItems] = React.useState<ItemDraft[]>(() => toItemDrafts(initial?.task_template_items ?? []));
+  const [editingItem, setEditingItem] = React.useState<ItemDraft | null>(null);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  function set<K extends keyof FormValues>(key: K, value: FormValues[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  function handleSave() {
-    upsertTaskTemplate(form);
+  async function handleSave() {
+    setSaving(true);
+    setError(null);
+    const itemsPayload = items.map(({ id, ...rest }, index) => ({ ...rest, position: index }));
+    const result =
+      mode === "create"
+        ? await createTaskTemplateAction(form, itemsPayload)
+        : await updateTaskTemplateAction(initial!.id, form, itemsPayload);
+    setSaving(false);
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
     router.push("/admin/voyages/modeles");
   }
 
@@ -243,16 +312,16 @@ export function TaskTemplateForm({ initial, mode }: TaskTemplateFormProps) {
     setEditingItem(null);
     setDialogOpen(true);
   }
-  function openEditItem(item: TaskTemplateItem) {
+  function openEditItem(item: ItemDraft) {
     setEditingItem(item);
     setDialogOpen(true);
   }
-  function saveItem(item: TaskTemplateItem) {
-    const exists = form.items.some((i) => i.id === item.id);
-    set("items", exists ? form.items.map((i) => (i.id === item.id ? item : i)) : [...form.items, item]);
+  function saveItem(item: ItemDraft) {
+    const exists = items.some((i) => i.id === item.id);
+    setItems((list) => (exists ? list.map((i) => (i.id === item.id ? item : i)) : [...list, item]));
   }
   function removeItem(id: string) {
-    set("items", form.items.filter((i) => i.id !== id));
+    setItems((list) => list.filter((i) => i.id !== id));
   }
 
   return (
@@ -264,13 +333,21 @@ export function TaskTemplateForm({ initial, mode }: TaskTemplateFormProps) {
         <div className="flex-1 min-w-0">
           <h1 className="text-lg font-bold text-stone-800 dark:text-stone-100">{mode === "create" ? "Nouveau modèle de tâches" : form.name || "Modifier le modèle"}</h1>
         </div>
-        <Button onClick={handleSave} disabled={!form.name.trim()}>Enregistrer</Button>
+        <Button onClick={handleSave} disabled={!form.name.trim() || saving}>
+          {saving ? "Enregistrement..." : "Enregistrer"}
+        </Button>
       </div>
+
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+          {error}
+        </div>
+      )}
 
       <Tabs defaultValue="general">
         <TabsList>
           <TabsTrigger value="general">Informations</TabsTrigger>
-          <TabsTrigger value="tasks">Tâches ({form.items.length})</TabsTrigger>
+          <TabsTrigger value="tasks">Tâches ({items.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
@@ -283,8 +360,8 @@ export function TaskTemplateForm({ initial, mode }: TaskTemplateFormProps) {
               <div className="space-y-1.5">
                 <Label>Thème de circuit associé</Label>
                 <Select
-                  value={form.circuitTheme ?? "NONE"}
-                  onValueChange={(v) => set("circuitTheme", v === "NONE" ? undefined : (v as TaskTemplate["circuitTheme"]))}
+                  value={form.circuit_theme ?? "NONE"}
+                  onValueChange={(v) => set("circuit_theme", v === "NONE" ? null : v)}
                 >
                   <SelectTrigger><SelectValue placeholder="Aucun thème" /></SelectTrigger>
                   <SelectContent>
@@ -303,12 +380,12 @@ export function TaskTemplateForm({ initial, mode }: TaskTemplateFormProps) {
           <Card>
             <CardHeader><CardTitle className="text-sm">Liste des tâches</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              {form.items.length === 0 ? (
+              {items.length === 0 ? (
                 <p className="text-sm text-stone-400 dark:text-stone-500">Aucune tâche. Ajoutez la première.</p>
               ) : (
                 <DragDropList
-                  items={form.items}
-                  onReorder={(items) => set("items", items)}
+                  items={items}
+                  onReorder={setItems}
                   renderItem={(item) => (
                     <button type="button" className="flex w-full items-center gap-2 py-1 text-left" onClick={() => openEditItem(item)}>
                       <div className="flex-1 min-w-0">
@@ -316,8 +393,8 @@ export function TaskTemplateForm({ initial, mode }: TaskTemplateFormProps) {
                         <div className="flex flex-wrap items-center gap-1.5 mt-1">
                           <StatusBadge status={item.phase} label={PHASE_LABELS[item.phase]} />
                           <StatusBadge status={item.category} label={CATEGORY_LABELS[item.category]} />
-                          <span className="text-xs text-stone-400 dark:text-stone-500">{dueOffsetLabel(item.dueOffsetDays)}</span>
-                          <span className="text-xs text-stone-400 dark:text-stone-500">· {item.assigneeRole}</span>
+                          <span className="text-xs text-stone-400 dark:text-stone-500">{dueOffsetLabel(item.due_offset_days)}</span>
+                          <span className="text-xs text-stone-400 dark:text-stone-500">· {item.assignee_role}</span>
                           {item.priority === "URGENTE" && <StatusBadge status="URGENTE" label="Urgente" />}
                         </div>
                       </div>
@@ -342,7 +419,14 @@ export function TaskTemplateForm({ initial, mode }: TaskTemplateFormProps) {
         </TabsContent>
       </Tabs>
 
-      <ItemEditDialog open={dialogOpen} onOpenChange={setDialogOpen} item={editingItem} onSave={saveItem} />
+      <ItemEditDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        item={editingItem}
+        onSave={saveItem}
+        commTemplates={commTemplates}
+        titleSuggestions={itemTitleSuggestions}
+      />
     </div>
   );
 }

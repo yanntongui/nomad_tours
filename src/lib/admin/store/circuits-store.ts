@@ -38,6 +38,7 @@ export function createEmptyCircuit(): Circuit {
     durationDays: 1,
     priceXOF: 0,
     theme: "Culture",
+    category: "ESCAPADE_LOCALE",
     isFeatured: false,
     images: [],
     itinerary: [],

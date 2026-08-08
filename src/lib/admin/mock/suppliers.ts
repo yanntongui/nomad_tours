@@ -1,0 +1,48 @@
+import { Supplier } from "@/lib/admin/types";
+
+export const SUPPLIERS: Supplier[] = [
+  {
+    id: "sup-1",
+    name: "Lodge Pendjari & Partenaires",
+    type: "HEBERGEMENT",
+    contactName: "Aïcha Bello",
+    contactPhone: "+229 97 12 34 56",
+    contactEmail: "contact@pendjari-lodge.bj",
+    notes: "Hébergement principal zone nord, prévoir confirmation 45 jours avant.",
+    active: true,
+    createdAt: "2025-02-10T09:00:00.000Z",
+  },
+  {
+    id: "sup-2",
+    name: "Transport Bénin VTC",
+    type: "TRANSPORT",
+    contactName: "Kossi Mensah",
+    contactPhone: "+229 96 45 67 89",
+    contactEmail: "reservation@beninvtc.com",
+    notes: "Flotte 4x4 climatisés, chauffeurs bilingues FR/EN.",
+    active: true,
+    createdAt: "2025-02-10T09:00:00.000Z",
+  },
+  {
+    id: "sup-3",
+    name: "Guides Culturels Abomey",
+    type: "GUIDE_LOCAL",
+    contactName: "Fabrice Houngbo",
+    contactPhone: "+229 95 78 90 12",
+    contactEmail: "guides@abomey-culture.bj",
+    notes: "Spécialistes histoire royale et sites classés UNESCO.",
+    active: true,
+    createdAt: "2025-03-01T09:00:00.000Z",
+  },
+  {
+    id: "sup-4",
+    name: "Traiteur Événementiel Cotonou",
+    type: "RESTAURATION",
+    contactName: "Sandrine Adjovi",
+    contactPhone: "+229 94 23 45 67",
+    contactEmail: "contact@traiteur-cotonou.bj",
+    notes: "Prestations mariages et séminaires, devis sous 48h.",
+    active: true,
+    createdAt: "2025-03-15T09:00:00.000Z",
+  },
+];

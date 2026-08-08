@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Phone, Compass, Calendar, Menu, X, Plane, FileCheck, Send, User } from "lucide-react";
+import { MapPin, Phone, Compass, Calendar, Menu, X, Plane, FileCheck, Send, User, LogIn } from "lucide-react";
 import { useQuoteModal } from "@/context/QuoteModalContext";
 
 export default function Header() {
@@ -79,8 +79,9 @@ export default function Header() {
               <User className="w-3.5 h-3.5 text-nomad-terracotta" />
               Espace Client
             </Link>
-            <Link href="/admin" className="text-stone-400 hover:text-stone-700 text-xs px-2.5 py-1 bg-stone-100 rounded-lg">
-              Admin
+            <Link href="/admin" className="text-stone-400 hover:text-stone-700 text-xs px-2.5 py-1 bg-stone-100 rounded-lg flex items-center gap-1">
+              <LogIn className="w-3 h-3" />
+              Connexion
             </Link>
           </nav>
 
@@ -162,9 +163,10 @@ export default function Header() {
           <Link
             href="/admin"
             onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-stone-500 font-medium hover:text-nomad-navy"
+            className="block py-2 text-stone-500 font-medium hover:text-nomad-navy flex items-center gap-1.5"
           >
-            Back-Office Admin
+            <LogIn className="w-3.5 h-3.5" />
+            Connexion (personnel)
           </Link>
           <button
             onClick={() => {
