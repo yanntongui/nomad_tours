@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Bell, Search, ChevronDown, LogOut } from "lucide-react";
+import { Bell, Search, ChevronDown, LogOut, Menu } from "lucide-react";
 import { useAdminRole } from "@/context/AdminRoleContext";
 import { createClient } from "@/lib/supabase/client";
 import { StatusBadge } from "@/components/admin/StatusBadge";
+import { ADMIN_SIDEBAR_TOGGLE_EVENT } from "@/components/admin/Sidebar";
 import { useNotifications, useUnreadCount, markRead, markAllRead } from "@/lib/admin/store/notifications-store";
 import {
   DropdownMenu,
@@ -36,6 +37,14 @@ export function Topbar() {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-stone-200 bg-white px-4 sm:px-6 dark:border-stone-800 dark:bg-stone-900">
+      <button
+        onClick={() => window.dispatchEvent(new Event(ADMIN_SIDEBAR_TOGGLE_EVENT))}
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800 md:hidden"
+        aria-label="Ouvrir le menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
       <div className="hidden sm:block flex-1 min-w-0">
         <Breadcrumb />
       </div>
