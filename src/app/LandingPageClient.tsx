@@ -23,12 +23,19 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Quote,
   Mail,
   Phone,
   Instagram,
   Facebook,
   Youtube,
+  Compass,
+  Plane,
+  FileCheck,
+  PartyPopper,
+  Car,
+  Home,
 } from "lucide-react";
 import { useQuoteModal } from "@/context/QuoteModalContext";
 import { HOMEPAGE_ICON_MAP } from "@/lib/admin/homepage-icons";
@@ -71,13 +78,20 @@ const staggerContainer: Variants = {
 /*  Data                                                               */
 /* ------------------------------------------------------------------ */
 
-const NAV_LINKS = [
-  { label: "Destinations", href: "/destinations" },
-  { label: "Circuits", href: "/circuits" },
-  { label: "Événementiel", href: "/evenements" },
-  { label: "Visa", href: "/visas" },
+const NAV_LINKS = [{ label: "Destinations", href: "/destinations" }];
+
+const NAV_LINKS_TAIL = [
   { label: "Galerie", href: "/galerie" },
   { label: "À propos", href: "#pourquoi" },
+];
+
+const SERVICES_LINKS = [
+  { label: "Circuits sur-mesure", href: "/circuits", icon: Compass },
+  { label: "Billetterie & Vols", href: "/vols", icon: Plane },
+  { label: "Assistance Visa", href: "/visas", icon: FileCheck },
+  { label: "Événementiel", href: "/evenements", icon: PartyPopper },
+  { label: "Nomad Car", href: "/nomad-car", icon: Car },
+  { label: "Nomad House", href: "/nomad-house", icon: Home },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -126,6 +140,8 @@ function AnimatedCounter({
 function PremiumHeader({ onOpenQuote }: { onOpenQuote: () => void }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -162,6 +178,59 @@ function PremiumHeader({ onOpenQuote }: { onOpenQuote: () => void }) {
           }`}
         >
           {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="relative py-1 hover:opacity-70 transition-opacity after:absolute after:left-0 after:-bottom-0.5 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full"
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          <div
+            className="relative"
+            onMouseEnter={() => setServicesOpen(true)}
+            onMouseLeave={() => setServicesOpen(false)}
+          >
+            <button
+              onClick={() => setServicesOpen((o) => !o)}
+              className="relative flex items-center gap-1 py-1 hover:opacity-70 transition-opacity"
+              aria-expanded={servicesOpen}
+            >
+              Nos Services
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${servicesOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            <AnimatePresence>
+              {servicesOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute left-1/2 -translate-x-1/2 top-full pt-4 w-[440px] normal-case"
+                >
+                  <div className="bg-white rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.14)] border border-luxe-ink/5 p-5 grid grid-cols-2 gap-2">
+                    {SERVICES_LINKS.map((service) => (
+                      <Link
+                        key={service.href}
+                        href={service.href}
+                        onClick={() => setServicesOpen(false)}
+                        className="flex items-center gap-3 p-3 rounded-xl text-luxe-ink hover:bg-luxe-sand transition-colors group"
+                      >
+                        <span className="w-9 h-9 rounded-lg bg-luxe-sand flex items-center justify-center text-luxe-terracotta group-hover:bg-white transition-colors shrink-0">
+                          <service.icon className="w-4 h-4" />
+                        </span>
+                        <span className="text-[13px] font-medium tracking-normal normal-case">{service.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {NAV_LINKS_TAIL.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -219,13 +288,71 @@ function PremiumHeader({ onOpenQuote }: { onOpenQuote: () => void }) {
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              <nav className="flex flex-col">
+              <nav className="flex flex-col overflow-y-auto">
                 {NAV_LINKS.map((link, i) => (
                   <motion.div
                     key={link.href}
                     initial={{ opacity: 0, x: 24 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 + i * 0.06, duration: 0.4 }}
+                  >
+                    <Link
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="block py-4 text-2xl font-serif text-luxe-ink border-b border-luxe-ink/10"
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+
+                <motion.div
+                  initial={{ opacity: 0, x: 24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + NAV_LINKS.length * 0.06, duration: 0.4 }}
+                  className="border-b border-luxe-ink/10"
+                >
+                  <button
+                    onClick={() => setMobileServicesOpen((o) => !o)}
+                    className="w-full flex items-center justify-between py-4 text-2xl font-serif text-luxe-ink"
+                    aria-expanded={mobileServicesOpen}
+                  >
+                    Nos Services
+                    <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${mobileServicesOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {mobileServicesOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pb-3 flex flex-col">
+                          {SERVICES_LINKS.map((service) => (
+                            <Link
+                              key={service.href}
+                              href={service.href}
+                              onClick={() => setMobileOpen(false)}
+                              className="flex items-center gap-3 py-2.5 text-luxe-ink/80"
+                            >
+                              <service.icon className="w-4 h-4 text-luxe-terracotta shrink-0" />
+                              <span className="text-base font-medium">{service.label}</span>
+                            </Link>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+
+                {NAV_LINKS_TAIL.map((link, i) => (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, x: 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + (NAV_LINKS.length + 1 + i) * 0.06, duration: 0.4 }}
                   >
                     <Link
                       href={link.href}
